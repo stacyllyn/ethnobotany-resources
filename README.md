@@ -28,6 +28,10 @@ up-to-date.
 
 You can also embed plots, for example:
 
+``` r
+plot(pressure)
+```
+
 ![](README_files/figure-gfm/pressure-1.png)<!-- -->
 
 In that case, don’t forget to commit and push the resulting figure
