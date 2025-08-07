@@ -22,16 +22,16 @@ practices.
 # Ethnobotanical Resources
 
 This repository collects datasets, field notes, and literature references  for plants used in traditional medicine and cultural practices.
+
 ```{r echo=FALSE, message=FALSE}
-library(readr)
+
 library(knitr)
 
 # Load the data from your repo
-databases <- read_csv("databases.csv")
+databases <- read.csv("data/ethnobotanical_databases.csv")
 
 # Render as a black-and-white Markdown table
 kable(databases, format = "markdown", align = "l")
 knitr::opts_knit$set(root.dir = "C:/Users/Stacy/OneDrive/Desktop/ethnobotany-resources2")
 
-
-
+```
