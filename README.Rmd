@@ -28,7 +28,7 @@ library(readr)
 library(knitr)
 
 # Load the data from your repo
-databases <- read_csv("databases.csv")
+databases <- read_csv("data/ethnobotanical_databases.csv")
 
 # Render as a black-and-white Markdown table
 kable(databases, format = "markdown", align = "l")
