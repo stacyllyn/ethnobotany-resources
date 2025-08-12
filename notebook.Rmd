@@ -1,0 +1,75 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Scraping BM-EB
+
+```{r scrape-bmeb}
+
+# Install packages if not already installed
+# install.packages("rvest")
+# install.packages("xml2")
+
+library(rvest)
+library(dplyr)
+
+# 1. Define the URL
+url <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=1"
+
+# 2. Read the HTML content
+page <- read_html(url)
+
+# 3. Inspect and extract all <table> elements
+tables <- page %>% html_nodes("table")
+
+# 4. Review how many tables are present
+length(tables)
+# print(head(html_table(tables[[1]], fill = TRUE)))
+
+# 5. Assuming the table of interest is the first one:
+ethno_table <- tables[[1]] %>% html_table(fill = TRUE)
+
+# 6. View or process the resulting data frame
+glimpse(ethno_table)
+
+
+
+
+```
+
+
+
+
+# ethnobotany-resources
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of ethnobotany-resources is to collect datasets, field notes, and literature references for plants used in traditional medicine and cultural
+practices.
+
+# Ethnobotanical Resources
+
+This repository collects datasets, field notes, and literature references  for plants used in traditional medicine and cultural practices.
+
+```{r echo=FALSE, message=FALSE}
+
+library(knitr)
+
+# Load the data from your repo
+databases <- read.csv("data/ethnobotanical_databases.csv")
+
+# Render as a black-and-white Markdown table
+kable(databases, format = "markdown", align = "l")
+knitr::opts_knit$set(root.dir = "C:/Users/Stacy/OneDrive/Desktop/ethnobotany-resources2")
+
+```
