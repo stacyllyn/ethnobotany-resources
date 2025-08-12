@@ -15,33 +15,51 @@ knitr::opts_chunk$set(
 
 ```{r scrape-bmeb}
 
-# Install packages if not already installed
-# install.packages("rvest")
-# install.packages("xml2")
+# --- Install required packages only if missing ---
 
+packages <- c("rvest", "xml2", "dplyr")
+
+install_if_missing <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
+invisible(lapply(packages, install_if_missing))
+
+# --- Load libraries ---
 library(rvest)
+library(xml2)
 library(dplyr)
 
-# 1. Define the URL
+# --- Define the URL ---
 url <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=1"
 
-# 2. Read the HTML content
+# --- Read the HTML content ---
 page <- read_html(url)
 
-# 3. Inspect and extract all <table> elements
+# --- Extract all <table> elements ---
 tables <- page %>% html_nodes("table")
 
-# 4. Review how many tables are present
+# --- Check how many tables are found ---
 length(tables)
-# print(head(html_table(tables[[1]], fill = TRUE)))
 
-# 5. Assuming the table of interest is the first one:
+# --- Convert the first table to a data frame ---
 ethno_table <- tables[[1]] %>% html_table(fill = TRUE)
 
-# 6. View or process the resulting data frame
+# --- Preview the data ---
 glimpse(ethno_table)
 
+# Optional: View first rows
+head(ethno_table)
 
+# --- Create 'data' directory if it doesn't exist ---
+if (!dir.exists("data")) {
+  dir.create("data")
+}
+
+# --- Save the table as CSV in the 'data' directory ---
+write.csv(ethno_table, file = "data/ethno_table.csv", row.names = FALSE)
 
 
 ```
