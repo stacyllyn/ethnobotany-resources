@@ -82,3 +82,41 @@ kable(bmeb, caption = "Ethnobotany plants in Bishop Museum")
 
 ```
 
+# Webcrawler
+
+```{r crawl}
+
+library(rvest)
+library(purrr)
+library(dplyr)
+
+                                        # 1. Read the main page
+url_main <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=1"
+page_main <- read_html(url_main)
+
+                                        # 2. Identify and extract all links from the table
+                                        # Adjust the CSS selector if needed (e.g. ".table-class a", "#mytable a", or "table a")
+links <- page_main %>%
+    html_nodes("table a") %>%          # select all anchor tags within tables
+    html_attr("href") %>%              # extract the href attribute
+    unique()                           # remove duplicates
+
+                                        # Convert relative URLs to full URLs if necessary
+links_full <- url_absolute(links, url_main)
+
+                                        # Inspect
+print(links_full)
+
+                                        # 3. Scrape each link
+results <- tibble(link = links_full) %>%
+    mutate(content = map(link, ~ {
+        page <- read_html(.x)
+                                        # Example: extract page title; adjust as needed
+        title <- page %>% html_node("title") %>% html_text(trim = TRUE)
+        data.frame(title = title, stringsAsFactors = FALSE)
+    }))
+
+print(results)
+
+
+```
