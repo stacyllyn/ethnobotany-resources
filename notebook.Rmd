@@ -5,7 +5,8 @@ output: github_document
 
 ```{r, include = FALSE}
 
-packages <- c("rvest", "xml2", "dplyr", "rmarkdown")
+packages <- c("rvest", "xml2", "dplyr", 
+              "rmarkdown", "knitr")
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -22,7 +23,7 @@ knitr::opts_chunk$set(
 )
 
 ```
-
+	
 # Scraping BM-EB
 
 ```{r scrape-bmeb}
@@ -68,5 +69,16 @@ write.csv(ethno_table, file = "data/ethno_table.csv", row.names = FALSE)
 ```
 
 
+# Display BM EB Table
 
+```{r bmeb-table}
+
+library(knitr)
+
+bmeb <- read.csv("data/ethno_table.csv")
+
+kable(bmeb, caption = "Ethnobotany plants in Bishop Museum")
+
+
+```
 

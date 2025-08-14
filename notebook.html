@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style type="text/css">
+@font-face {
+font-family: octicons-link;
+src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+body {
+-webkit-text-size-adjust: 100%;
+text-size-adjust: 100%;
+color: #333;
+font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+font-size: 16px;
+line-height: 1.6;
+word-wrap: break-word;
+}
+a {
+background-color: transparent;
+}
+a:active,
+a:hover {
+outline: 0;
+}
+strong {
+font-weight: bold;
+}
+h1 {
+font-size: 2em;
+margin: 0.67em 0;
+}
+img {
+border: 0;
+}
+hr {
+box-sizing: content-box;
+height: 0;
+}
+pre {
+overflow: auto;
+}
+code,
+kbd,
+pre {
+font-family: monospace, monospace;
+font-size: 1em;
+}
+input {
+color: inherit;
+font: inherit;
+margin: 0;
+}
+html input[disabled] {
+cursor: default;
+}
+input {
+line-height: normal;
+}
+input[type="checkbox"] {
+box-sizing: border-box;
+padding: 0;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+td,
+th {
+padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+input {
+font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+a {
+color: #4078c0;
+text-decoration: none;
+}
+a:hover,
+a:active {
+text-decoration: underline;
+}
+hr {
+height: 0;
+margin: 15px 0;
+overflow: hidden;
+background: transparent;
+border: 0;
+border-bottom: 1px solid #ddd;
+}
+hr:before {
+display: table;
+content: "";
+}
+hr:after {
+display: table;
+clear: both;
+content: "";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 15px;
+margin-bottom: 15px;
+line-height: 1.1;
+}
+h1 {
+font-size: 30px;
+}
+h2 {
+font-size: 21px;
+}
+h3 {
+font-size: 16px;
+}
+h4 {
+font-size: 14px;
+}
+h5 {
+font-size: 12px;
+}
+h6 {
+font-size: 11px;
+}
+blockquote {
+margin: 0;
+}
+ul,
+ol {
+padding: 0;
+margin-top: 0;
+margin-bottom: 0;
+}
+ol ol,
+ul ol {
+list-style-type: lower-roman;
+}
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+list-style-type: lower-alpha;
+}
+dd {
+margin-left: 0;
+}
+code {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+pre {
+margin-top: 0;
+margin-bottom: 0;
+font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.select::-ms-expand {
+opacity: 0;
+}
+.octicon {
+font: normal normal normal 16px/1 octicons-link;
+display: inline-block;
+text-decoration: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+.octicon-link:before {
+content: '\f05c';
+}
+.markdown-body:before {
+display: table;
+content: "";
+}
+.markdown-body:after {
+display: table;
+clear: both;
+content: "";
+}
+.markdown-body>*:first-child {
+margin-top: 0 !important;
+}
+.markdown-body>*:last-child {
+margin-bottom: 0 !important;
+}
+a:not([href]) {
+color: inherit;
+text-decoration: none;
+}
+.anchor {
+display: inline-block;
+padding-right: 2px;
+margin-left: -18px;
+}
+.anchor:focus {
+outline: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 1em;
+margin-bottom: 16px;
+font-weight: bold;
+line-height: 1.4;
+}
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+color: #000;
+vertical-align: middle;
+visibility: hidden;
+}
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+text-decoration: none;
+}
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+visibility: visible;
+}
+h1 {
+padding-bottom: 0.3em;
+font-size: 2.25em;
+line-height: 1.2;
+border-bottom: 1px solid #eee;
+}
+h1 .anchor {
+line-height: 1;
+}
+h2 {
+padding-bottom: 0.3em;
+font-size: 1.75em;
+line-height: 1.225;
+border-bottom: 1px solid #eee;
+}
+h2 .anchor {
+line-height: 1;
+}
+h3 {
+font-size: 1.5em;
+line-height: 1.43;
+}
+h3 .anchor {
+line-height: 1.2;
+}
+h4 {
+font-size: 1.25em;
+}
+h4 .anchor {
+line-height: 1.2;
+}
+h5 {
+font-size: 1em;
+}
+h5 .anchor {
+line-height: 1.1;
+}
+h6 {
+font-size: 1em;
+color: #777;
+}
+h6 .anchor {
+line-height: 1.1;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre {
+margin-top: 0;
+margin-bottom: 16px;
+}
+hr {
+height: 4px;
+padding: 0;
+margin: 16px 0;
+background-color: #e7e7e7;
+border: 0 none;
+}
+ul,
+ol {
+padding-left: 2em;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-top: 0;
+margin-bottom: 0;
+}
+li>p {
+margin-top: 16px;
+}
+dl {
+padding: 0;
+}
+dl dt {
+padding: 0;
+margin-top: 16px;
+font-size: 1em;
+font-style: italic;
+font-weight: bold;
+}
+dl dd {
+padding: 0 16px;
+margin-bottom: 16px;
+}
+blockquote {
+padding: 0 15px;
+color: #777;
+border-left: 4px solid #ddd;
+}
+blockquote>:first-child {
+margin-top: 0;
+}
+blockquote>:last-child {
+margin-bottom: 0;
+}
+table {
+display: block;
+width: 100%;
+overflow: auto;
+word-break: normal;
+word-break: keep-all;
+}
+table th {
+font-weight: bold;
+}
+table th,
+table td {
+padding: 6px 13px;
+border: 1px solid #ddd;
+}
+table tr {
+background-color: #fff;
+border-top: 1px solid #ccc;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+img {
+max-width: 100%;
+box-sizing: content-box;
+background-color: #fff;
+}
+code {
+padding: 0;
+padding-top: 0.2em;
+padding-bottom: 0.2em;
+margin: 0;
+font-size: 85%;
+background-color: rgba(0,0,0,0.04);
+border-radius: 3px;
+}
+code:before,
+code:after {
+letter-spacing: -0.2em;
+content: "\00a0";
+}
+pre>code {
+padding: 0;
+margin: 0;
+font-size: 100%;
+word-break: normal;
+white-space: pre;
+background: transparent;
+border: 0;
+}
+.highlight {
+margin-bottom: 16px;
+}
+.highlight pre,
+pre {
+padding: 16px;
+overflow: auto;
+font-size: 85%;
+line-height: 1.45;
+background-color: #f7f7f7;
+border-radius: 3px;
+}
+.highlight pre {
+margin-bottom: 0;
+word-break: normal;
+}
+pre {
+word-wrap: normal;
+}
+pre code {
+display: inline;
+max-width: initial;
+padding: 0;
+margin: 0;
+overflow: initial;
+line-height: inherit;
+word-wrap: normal;
+background-color: transparent;
+border: 0;
+}
+pre code:before,
+pre code:after {
+content: normal;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font-size: 11px;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.pl-c {
+color: #969896;
+}
+.pl-c1,
+.pl-s .pl-v {
+color: #0086b3;
+}
+.pl-e,
+.pl-en {
+color: #795da3;
+}
+.pl-s .pl-s1,
+.pl-smi {
+color: #333;
+}
+.pl-ent {
+color: #63a35c;
+}
+.pl-k {
+color: #a71d5d;
+}
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+color: #183691;
+}
+.pl-v {
+color: #ed6a43;
+}
+.pl-id {
+color: #b52a1d;
+}
+.pl-ii {
+background-color: #b52a1d;
+color: #f8f8f8;
+}
+.pl-sr .pl-cce {
+color: #63a35c;
+font-weight: bold;
+}
+.pl-ml {
+color: #693a17;
+}
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+color: #1d3e81;
+font-weight: bold;
+}
+.pl-mq {
+color: #008080;
+}
+.pl-mi {
+color: #333;
+font-style: italic;
+}
+.pl-mb {
+color: #333;
+font-weight: bold;
+}
+.pl-md {
+background-color: #ffecec;
+color: #bd2c00;
+}
+.pl-mi1 {
+background-color: #eaffea;
+color: #55a532;
+}
+.pl-mdr {
+color: #795da3;
+font-weight: bold;
+}
+.pl-mo {
+color: #1d3e81;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.task-list-item {
+list-style-type: none;
+}
+.task-list-item+.task-list-item {
+margin-top: 3px;
+}
+.task-list-item input {
+margin: 0 0.35em 0.25em -1.6em;
+vertical-align: middle;
+}
+:checked+.radio-label {
+z-index: 1;
+position: relative;
+border-color: #4078c0;
+}
+.sourceLine {
+display: inline-block;
+}
+code .kw { color: #000000; }
+code .dt { color: #ed6a43; }
+code .dv { color: #009999; }
+code .bn { color: #009999; }
+code .fl { color: #009999; }
+code .ch { color: #009999; }
+code .st { color: #183691; }
+code .co { color: #969896; }
+code .ot { color: #0086b3; }
+code .al { color: #a61717; }
+code .fu { color: #63a35c; }
+code .er { color: #a61717; background-color: #e3d2d2; }
+code .wa { color: #000000; }
+code .cn { color: #008080; }
+code .sc { color: #008080; }
+code .vs { color: #183691; }
+code .ss { color: #183691; }
+code .im { color: #000000; }
+code .va {color: #008080; }
+code .cf { color: #000000; }
+code .op { color: #000000; }
+code .bu { color: #000000; }
+code .ex { color: #000000; }
+code .pp { color: #999999; }
+code .at { color: #008080; }
+code .do { color: #969896; }
+code .an { color: #008080; }
+code .cv { color: #008080; }
+code .in { color: #008080; }
+</style>
+<style>
+body {
+box-sizing: border-box;
+min-width: 200px;
+max-width: 980px;
+margin: 0 auto;
+padding: 45px;
+padding-top: 0px;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<h1 id="scraping-bm-eb">Scraping BM-EB</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># --- Install required packages only if missing ---</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co"># --- Load libraries ---</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">library</span>(xml2)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co"># --- Define the URL ---</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&amp;o=1&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co"># --- Read the HTML content ---</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>page <span class="ot">&lt;-</span> <span class="fu">read_html</span>(url)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># --- Extract all &lt;table&gt; elements ---</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>tables <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co"># --- Check how many tables are found ---</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="fu">length</span>(tables)</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co"># --- Convert the first table to a data frame ---</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>ethno_table <span class="ot">&lt;-</span> tables[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span> <span class="fu">html_table</span>(<span class="at">fill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># --- Preview the data ---</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="fu">glimpse</span>(ethno_table)</span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt; Rows: 145</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt; Columns: 3</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co">#&gt; $ `Hawaiian Name`   &lt;chr&gt; &quot;‘a‘ali‘i&quot;, &quot;a‘e (Sapindus)&quot;, &quot;a‘e (Zanthoxylem)&quot;, &quot;…</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt; $ `Scientific Name` &lt;chr&gt; &quot;Dodonaea viscosa&quot;, &quot;Sapindus saponaria&quot;, &quot;Zanthoxyl…</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; $ `Vernacular Name` &lt;chr&gt; &quot;none&quot;, &quot;soapberry&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;sedge&quot;…</span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co"># Optional: View first rows</span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="fu">head</span>(ethno_table)</span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 3</span></span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt;   `Hawaiian Name`   `Scientific Name`       `Vernacular Name`</span></span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;                   &lt;chr&gt;            </span></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; 1 ‘a‘ali‘i          Dodonaea viscosa        none             </span></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; 2 a‘e (Sapindus)    Sapindus saponaria      soapberry        </span></span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; 3 a‘e (Zanthoxylem) Zanthoxylum (4 species) none             </span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="co">#&gt; 4 ‘ahakea           Bobea (4 species)       none             </span></span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co">#&gt; 5 ‘āheahea          Chenopodium oahuense    none             </span></span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co">#&gt; 6 ‘ahu‘awa          Cyperus javanicus       sedge</span></span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a><span class="co"># --- Create &#39;data&#39; directory if it doesn&#39;t exist ---</span></span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">&quot;data&quot;</span>)) {</span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">&quot;data&quot;</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a>}</span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a><span class="co"># --- Save the table as CSV in the &#39;data&#39; directory ---</span></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a><span class="fu">write.csv</span>(ethno_table, <span class="at">file =</span> <span class="st">&quot;data/ethno_table.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<h1 id="display-bm-eb-table">Display BM EB Table</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>bmeb <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/ethno_table.csv&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">kable</span>(bmeb, <span class="at">caption =</span> <span class="st">&quot;Ethnobotany plants in Bishop Museum&quot;</span>)</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th align="left">Hawaiian.Name</th>
+<th align="left">Scientific.Name</th>
+<th align="left">Vernacular.Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">‘a‘ali‘i</td>
+<td align="left">Dodonaea viscosa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">a‘e (Sapindus)</td>
+<td align="left">Sapindus saponaria</td>
+<td align="left">soapberry</td>
+</tr>
+<tr>
+<td align="left">a‘e (Zanthoxylem)</td>
+<td align="left">Zanthoxylum (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ahakea</td>
+<td align="left">Bobea (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘āheahea</td>
+<td align="left">Chenopodium oahuense</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ahu‘awa</td>
+<td align="left">Cyperus javanicus</td>
+<td align="left">sedge</td>
+</tr>
+<tr>
+<td align="left">aiea</td>
+<td align="left">Nothocestrum (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘aka‘akai</td>
+<td align="left">Schoenoplectus lacustris</td>
+<td align="left">great bulrush</td>
+</tr>
+<tr>
+<td align="left">‘ākala</td>
+<td align="left">Rubus (2 species)</td>
+<td align="left">Hawaiian raspberry</td>
+</tr>
+<tr>
+<td align="left">‘ākia</td>
+<td align="left">Wikstroemia (12 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘akoko</td>
+<td align="left">Chamaesyce (16 species)</td>
+<td align="left">spurge</td>
+</tr>
+<tr>
+<td align="left">‘aākōlea</td>
+<td align="left">Athyrium microphyllum</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ākulikuli</td>
+<td align="left">Sesuvium portulacastrum</td>
+<td align="left">sea purslane</td>
+</tr>
+<tr>
+<td align="left">‘āla‘a</td>
+<td align="left">Pouteria sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ala‘ala wai nui</td>
+<td align="left">Peperomia (24 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">alahe‘e</td>
+<td align="left">Psydrax odorata</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">alani</td>
+<td align="left">Melicope (47 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">ali‘ipoe</td>
+<td align="left">Canna indica</td>
+<td align="left">Indian-shot</td>
+</tr>
+<tr>
+<td align="left">aloalo</td>
+<td align="left">Hibiscus (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ama‘u</td>
+<td align="left">Sadleria cyatheoides</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ape</td>
+<td align="left">Alocasia macrorrhizos</td>
+<td align="left">elephant’s ear</td>
+</tr>
+<tr>
+<td align="left">‘auhuhu</td>
+<td align="left">Tephrosia purpurea</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘awa</td>
+<td align="left">Piper methysticum</td>
+<td align="left">kava</td>
+</tr>
+<tr>
+<td align="left">‘awapuhi</td>
+<td align="left">Zingiber zerumbet</td>
+<td align="left">shampoo ginger, wild ginger</td>
+</tr>
+<tr>
+<td align="left">‘āwikiwiki</td>
+<td align="left">Canavalia (6 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hala</td>
+<td align="left">Pandanus tectorius</td>
+<td align="left">screw pine</td>
+</tr>
+<tr>
+<td align="left">hala pepe</td>
+<td align="left">Pleomele (6 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hame</td>
+<td align="left">Antidesma (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hao</td>
+<td align="left">Rauvolfia sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hāpu‘u</td>
+<td align="left">Cibotium (2 species)</td>
+<td align="left">tree fern</td>
+</tr>
+<tr>
+<td align="left">hau</td>
+<td align="left">Hibiscus tiliaceus</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hinahina</td>
+<td align="left">Heliotropium anomalum var. argentea</td>
+<td align="left">heliotrope</td>
+</tr>
+<tr>
+<td align="left">hō‘awa</td>
+<td align="left">Pittosporum (11 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">hoi</td>
+<td align="left">Dioscorea bulbifera</td>
+<td align="left">bitter yam, air potato</td>
+</tr>
+<tr>
+<td align="left">hōlei</td>
+<td align="left">Ochrosia (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ie‘ie</td>
+<td align="left">Freycinetia arborea</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘iliahi</td>
+<td align="left">Santalum (4 species)</td>
+<td align="left">sandalwood</td>
+</tr>
+<tr>
+<td align="left">‘ilie‘e</td>
+<td align="left">Plumbago zeylanica</td>
+<td align="left">leadwort</td>
+</tr>
+<tr>
+<td align="left">‘ilima</td>
+<td align="left">Sida fallax</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">ipu</td>
+<td align="left">Lagenaria siceraria</td>
+<td align="left">bottle gourd</td>
+</tr>
+<tr>
+<td align="left">kalia</td>
+<td align="left">Elaeocarpus bifidus</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kalo</td>
+<td align="left">Colocasia esculenta</td>
+<td align="left">taro</td>
+</tr>
+<tr>
+<td align="left">kamani</td>
+<td align="left">Calophyllum inophyllum</td>
+<td align="left">Alexandrian laurel</td>
+</tr>
+<tr>
+<td align="left">kauila (Alphitonia)</td>
+<td align="left">Alphitonia ponderosa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kauila (Colubrina)</td>
+<td align="left">Colubrina oppositifolia</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kauna‘oa</td>
+<td align="left">Cuscuta sandwichiana</td>
+<td align="left">dodder</td>
+</tr>
+<tr>
+<td align="left">kāwa‘u</td>
+<td align="left">Ilex anomala</td>
+<td align="left">Hawaiian holly</td>
+</tr>
+<tr>
+<td align="left">kāwelu</td>
+<td align="left">Eragrostis variabilis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kī</td>
+<td align="left">Cordyline fruticosa</td>
+<td align="left">ti</td>
+</tr>
+<tr>
+<td align="left">kī nehe</td>
+<td align="left">Bidens pilosa</td>
+<td align="left">Spanish needle, beggartick</td>
+</tr>
+<tr>
+<td align="left">kō</td>
+<td align="left">Saccharum officinarum</td>
+<td align="left">sugarcane</td>
+</tr>
+<tr>
+<td align="left">koa</td>
+<td align="left">Acacia koa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">koai‘a</td>
+<td align="left">Acacia koaia</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">koali ‘ai</td>
+<td align="left">Ipomoea cairica</td>
+<td align="left">ivy-leaved morning glory</td>
+</tr>
+<tr>
+<td align="left">koali ‘awa</td>
+<td align="left">Ipomoea indica</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kohekohe</td>
+<td align="left">Eleocharis (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">koki‘o</td>
+<td align="left">Kokia &amp; Hibiscus (5 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">koki‘o ke‘oke‘o</td>
+<td align="left">Hibiscus arnottianus</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kōlea</td>
+<td align="left">Myrsine (20 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kolokolo kuahiwi</td>
+<td align="left">Lysimachia (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kolomona</td>
+<td align="left">Senna gaudichaudii</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">ko‘oko‘olau</td>
+<td align="left">Bidens (19 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kōpiko</td>
+<td align="left">Psychotria (11 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kou</td>
+<td align="left">Cordia subcordata</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kūkaenēnē,</td>
+<td align="left">Coprosma ernodeides</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">kūkaepua‘a</td>
+<td align="left">Digitaria setigera</td>
+<td align="left">itchy crabgrass</td>
+</tr>
+<tr>
+<td align="left">kukui</td>
+<td align="left">Aleurites moluccana</td>
+<td align="left">candlenut, tung tree</td>
+</tr>
+<tr>
+<td align="left">kupukupu</td>
+<td align="left">Nephrolepis cordifolia</td>
+<td align="left">sword fern</td>
+</tr>
+<tr>
+<td align="left">la‘amia</td>
+<td align="left">Cresentia cujete</td>
+<td align="left">calabash tree</td>
+</tr>
+<tr>
+<td align="left">lama</td>
+<td align="left">Diospyros (2 species)</td>
+<td align="left">persimmon, ebony</td>
+</tr>
+<tr>
+<td align="left">laua‘e</td>
+<td align="left">Phymatosorus grossus</td>
+<td align="left">maile-scented fern</td>
+</tr>
+<tr>
+<td align="left">laukahi kuahiwi</td>
+<td align="left">Plantago (3 species)</td>
+<td align="left">plantain</td>
+</tr>
+<tr>
+<td align="left">lehua papa</td>
+<td align="left">Metrosideros rugosa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">loulu</td>
+<td align="left">Pritchardia (22 species)</td>
+<td align="left">native fan palm</td>
+</tr>
+<tr>
+<td align="left">ma‘aloa</td>
+<td align="left">Neraudia melastomifolia</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">mai‘a</td>
+<td align="left">Musa x paradisiaca</td>
+<td align="left">banana</td>
+</tr>
+<tr>
+<td align="left">mai‘a hē‘ī</td>
+<td align="left">Musa troglodytarum</td>
+<td align="left">banana (Tahiti)</td>
+</tr>
+<tr>
+<td align="left">maile</td>
+<td align="left">Alyxia stellata</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">makaloa</td>
+<td align="left">Cyperus laevigatus</td>
+<td align="left">umbrella sedge</td>
+</tr>
+<tr>
+<td align="left">māmaki</td>
+<td align="left">Pipturus (4 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">māmane,</td>
+<td align="left">Sophora chrysophylla</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">manono</td>
+<td align="left">Kadua (3 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">ma‘o (Abutilon)</td>
+<td align="left">Abutilon incanum</td>
+<td align="left">hoary abutilon</td>
+</tr>
+<tr>
+<td align="left">ma‘o (Gossypium)</td>
+<td align="left">Gossypium tomentosum</td>
+<td align="left">Hawaiian cotton</td>
+</tr>
+<tr>
+<td align="left">maua</td>
+<td align="left">Xylosma hawaiiense</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">mau‘u lāili</td>
+<td align="left">Sisyrinchium acre</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">mēhamehame</td>
+<td align="left">Flueggea neowawraea</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">milo</td>
+<td align="left">Thespesia populnea</td>
+<td align="left">portia tree</td>
+</tr>
+<tr>
+<td align="left">moa</td>
+<td align="left">Psilotum nudum</td>
+<td align="left">upright whisk fern</td>
+</tr>
+<tr>
+<td align="left">mokihana</td>
+<td align="left">Melicope anisata</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">na‘ena‘e</td>
+<td align="left">Dubautia (24 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">naio</td>
+<td align="left">Myoporum sandwicense</td>
+<td align="left">false sandalwood, bastard sandalwood</td>
+</tr>
+<tr>
+<td align="left">nānū</td>
+<td align="left">Gardenia (3 species)</td>
+<td align="left">Hawaiian gardenia</td>
+</tr>
+<tr>
+<td align="left">naupaka kahakai</td>
+<td align="left">Scaevola taccada</td>
+<td align="left">beach naupaka</td>
+</tr>
+<tr>
+<td align="left">naupaka kuahiwi</td>
+<td align="left">Scaevola (9 species)</td>
+<td align="left">dwarf naupaka (S. coriacea</td>
+</tr>
+<tr>
+<td align="left">nehe</td>
+<td align="left">Lipochaeta &amp; Melanthera (20 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">nīoi</td>
+<td align="left">Eugenia (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">niu</td>
+<td align="left">Cocos nucifera</td>
+<td align="left">coconut</td>
+</tr>
+<tr>
+<td align="left">noni</td>
+<td align="left">Morinda citrifolia</td>
+<td align="left">Indian mulberry</td>
+</tr>
+<tr>
+<td align="left">nuku ‘i‘iwi</td>
+<td align="left">Strongylodon ruber</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ohai</td>
+<td align="left">Sesbania tomentosa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ōhā wai</td>
+<td align="left">Clermontia (22 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ohe</td>
+<td align="left">Schizostachyum glaucifolium</td>
+<td align="left">native bamboo, Polynesian bamboo</td>
+</tr>
+<tr>
+<td align="left">‘ōhelo</td>
+<td align="left">Vaccinium (3 species)</td>
+<td align="left">blueberry</td>
+</tr>
+<tr>
+<td align="left">‘ohe makai</td>
+<td align="left">Reynoldsia sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ohe ‘ohe</td>
+<td align="left">Tetraplasandra (8 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ōhi‘a ‘ai</td>
+<td align="left">Syzygium malaccense</td>
+<td align="left">mountain apple, Malay apple</td>
+</tr>
+<tr>
+<td align="left">‘ōhi‘a hā</td>
+<td align="left">Syzygium sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ōhi‘a lehua</td>
+<td align="left">Metrosideros (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ōkaha</td>
+<td align="left">Asplenium nidus</td>
+<td align="left">bird’s nest fern</td>
+</tr>
+<tr>
+<td align="left">‘ōlapa</td>
+<td align="left">Cheirodendron (5 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ōolena</td>
+<td align="left">Curcuma longa</td>
+<td align="left">turmeric</td>
+</tr>
+<tr>
+<td align="left">olomea</td>
+<td align="left">Perrottetia sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">olonā</td>
+<td align="left">Touchardia latifolia</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">olopua</td>
+<td align="left">Nestegis sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">ūpuhe</td>
+<td align="left">Urera (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pā‘ihi</td>
+<td align="left">Rorippa sarmentosa</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pa‘iniu</td>
+<td align="left">Astelia (3 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pala</td>
+<td align="left">Marattia douglasii</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pala‘ā</td>
+<td align="left">Sphenomeris chinensis</td>
+<td align="left">lace fern</td>
+</tr>
+<tr>
+<td align="left">palapalai</td>
+<td align="left">Microlepia strigosa</td>
+<td align="left">lace fern</td>
+</tr>
+<tr>
+<td align="left">pāmoho</td>
+<td align="left">Nephrolepis exaltata subsp. hawaiiensis</td>
+<td align="left">sword fern</td>
+</tr>
+<tr>
+<td align="left">pāpala</td>
+<td align="left">Charpetiera (5 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pāpala kōpau</td>
+<td align="left">Pisonia (5 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pi‘ia</td>
+<td align="left">Dioscorea pentaphylla</td>
+<td align="left">pi‘a Hawai‘i, wild yam</td>
+</tr>
+<tr>
+<td align="left">pia or arrowroot</td>
+<td align="left">Tacca leontopetaloides</td>
+<td align="left">Polynesian arrowroot</td>
+</tr>
+<tr>
+<td align="left">pili</td>
+<td align="left">Heteropogon contortus</td>
+<td align="left">tanglehead, twisted beardgrass, pili grass</td>
+</tr>
+<tr>
+<td align="left">pilo</td>
+<td align="left">Coprosma (12 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">pōhinahina</td>
+<td align="left">Vitex rotundifolia</td>
+<td align="left">beach vitex</td>
+</tr>
+<tr>
+<td align="left">pōhuehue</td>
+<td align="left">Ipomoea pes-caprae</td>
+<td align="left">beach morning glory</td>
+</tr>
+<tr>
+<td align="left">pōpolo</td>
+<td align="left">Solanum americanum</td>
+<td align="left">glossy nightshade</td>
+</tr>
+<tr>
+<td align="left">pōpolo kū mai</td>
+<td align="left">Phytolacca sandwicensis</td>
+<td align="left">pokeberry, pokeweed</td>
+</tr>
+<tr>
+<td align="left">pua kala</td>
+<td align="left">Argemone glauca</td>
+<td align="left">prickly poppy</td>
+</tr>
+<tr>
+<td align="left">pūkiawe</td>
+<td align="left">Leptecophylla tameiameiae</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘uala</td>
+<td align="left">Ipomoea batatas</td>
+<td align="left">sweet potato</td>
+</tr>
+<tr>
+<td align="left">‘uhaloa</td>
+<td align="left">Waltheria indica</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">uhi</td>
+<td align="left">Dioscorea alata</td>
+<td align="left">yam</td>
+</tr>
+<tr>
+<td align="left">uhiuhi</td>
+<td align="left">Caesalpinia kavaiensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘uki</td>
+<td align="left">Machaerina (2 species)</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘uki‘uki</td>
+<td align="left">Dianella sandwicensis</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ūlei</td>
+<td align="left">Osteomeles anthyllidifolia</td>
+<td align="left">none</td>
+</tr>
+<tr>
+<td align="left">‘ulu</td>
+<td align="left">Artocarpus altilis</td>
+<td align="left">breadfruit</td>
+</tr>
+<tr>
+<td align="left">uluhe</td>
+<td align="left">Dicranopteris linearis</td>
+<td align="left">false staghorn fern</td>
+</tr>
+<tr>
+<td align="left">wauke</td>
+<td align="left">Broussonetia papyrifera</td>
+<td align="left">paper mulberry</td>
+</tr>
+<tr>
+<td align="left">wiliwili</td>
+<td align="left">Erythrina sandwicensis</td>
+<td align="left">none</td>
+</tr>
+</tbody>
+</table>
+<p>Ethnobotany plants in Bishop Museum</p>
+
+</body>
+</html>
