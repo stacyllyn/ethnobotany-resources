@@ -88,6 +88,16 @@ kable(bmeb, caption = "Ethnobotany plants in Bishop Museum")
 
 # Webcrawler
 
+Coded with assistance from ChatGPT. 
+
+Currently should have the following functionality: 
+
+* Scrapes all pages with pagination,
+* Pulls all depth-2 details,
+* Normalizes them into a single `data.table`,
+* Polite throttling included, and
+* Can resume if interrupted.
+
 ```{r crawl}
 
 # Install/load packages
