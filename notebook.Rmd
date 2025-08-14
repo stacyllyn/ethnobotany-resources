@@ -98,17 +98,29 @@ library(data.table)
 library(purrr)
 library(stringr)
 
-                                        # Base URL (note: page numbers go in o=)
+                                        # Base URL (pagination placeholder)
 base_url_template <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=%d"
 
-                                        # ---- Step 1: Function to scrape one depth-1 page ----
+                                        # Output files for resume
+depth1_file <- "ethnobotany_depth1_progress.csv"
+final_file  <- "ethnobotany_full_normalized.csv"
+
+                                        # ---- Step 1: Load existing depth-1 data if resuming ----
+if (file.exists(depth1_file)) {
+    depth1_dt <- fread(depth1_file)
+    message("Resuming with ", nrow(depth1_dt), " depth-1 rows already scraped.")
+} else {
+    depth1_dt <- data.table()
+}
+
+                                        # ---- Step 2: Scrape depth-1 pages ----
 scrape_depth1_page <- function(page_number) {
     url <- sprintf(base_url_template, page_number)
     message("Scraping depth-1 page: ", url)
 
-    page <- read_html(url)
+    page <- tryCatch(read_html(url), error = function(e) return(NULL))
+    if (is.null(page)) return(NULL)
 
-                                        # Check if there is a table; return NULL if none
     tbl_node <- page %>% html_node("table")
     if (is.na(tbl_node) || length(tbl_node) == 0) return(NULL)
 
@@ -118,7 +130,7 @@ scrape_depth1_page <- function(page_number) {
     dt <- as.data.table(main_table)
     setnames(dt, make.names(names(dt), unique = TRUE))
 
-                                        # Get Hawaiian Name links
+                                        # Hawaiian Name links
     hawaiian_nodes <- page %>%
         html_nodes("table tr td:nth-child(1) a")
 
@@ -128,12 +140,31 @@ scrape_depth1_page <- function(page_number) {
 
     dt[, Detail_URL := hawaiian_links]
 
+    Sys.sleep(runif(1, 1, 3))  # polite random pause
     return(dt)
 }
 
-                                        # ---- Step 2: Function to scrape depth-2 details ----
+                                        # If no depth-1 data yet, start scraping from page 1
+if (nrow(depth1_dt) == 0) {
+    all_depth1 <- list()
+    page_number <- 1
+
+    repeat {
+        dt <- scrape_depth1_page(page_number)
+        if (is.null(dt)) break
+        all_depth1[[length(all_depth1) + 1]] <- dt
+        depth1_dt <- rbindlist(all_depth1, fill = TRUE)
+        fwrite(depth1_dt, depth1_file)  # save progress
+        page_number <- page_number + 1
+    }
+}
+
+                                        # ---- Step 3: Scrape depth-2 detail pages ----
 scrape_detail_page <- function(url) {
-    page <- read_html(url)
+    message("   Depth-2: ", url)
+
+    page <- tryCatch(read_html(url), error = function(e) return(NULL))
+    if (is.null(page)) return(list())
 
     detail_tables <- page %>%
         html_nodes("table") %>%
@@ -152,34 +183,42 @@ scrape_detail_page <- function(url) {
         values <- list()
     }
 
-    Sys.sleep(runif(1, 1, 3))  # pause between 1–3 seconds
-
+    Sys.sleep(runif(1, 1, 3))  # polite random pause
     return(values)
 }
 
-                                        # ---- Step 3: Loop over all pagination ----
-all_depth1 <- list()
-page_number <- 1
-
-repeat {
-    dt <- scrape_depth1_page(page_number)
-    if (is.null(dt)) break
-
-    all_depth1[[length(all_depth1) + 1]] <- dt
-    page_number <- page_number + 1
+                                        # ---- Step 4: Resume-aware depth-2 scraping ----
+if (file.exists(final_file)) {
+    final_dt <- fread(final_file)
+    scraped_urls <- unique(final_dt$Detail_URL)
+} else {
+    final_dt <- NULL
+    scraped_urls <- character()
 }
 
-depth1_dt <- rbindlist(all_depth1, fill = TRUE)
+                                        # Filter only URLs we haven't scraped yet
+pending_urls <- setdiff(depth1_dt$Detail_URL, scraped_urls)
+message("Depth-2 pages remaining: ", length(pending_urls))
 
-                                        # ---- Step 4: Scrape all depth-2 pages ----
-detail_list <- map(depth1_dt$Detail_URL, scrape_detail_page)
+                                        # Scrape only pending detail pages
+detail_list <- map(pending_urls, scrape_detail_page)
 
-                                        # ---- Step 5: Merge into one normalized data.table ----
+                                        # Convert to data.table
 details_dt <- rbindlist(detail_list, fill = TRUE)
-final_dt <- cbind(depth1_dt, details_dt)
 
-                                        # ---- Step 6: Save to CSV ----
-fwrite(final_dt, "data/ethnobotany_full_normalized.csv")
+                                        # Match them back to depth1 rows
+new_data <- depth1_dt[Detail_URL %in% pending_urls]
+final_batch <- cbind(new_data, details_dt)
+
+                                        # Append to final dataset
+if (!is.null(final_dt)) {
+    final_dt <- rbindlist(list(final_dt, final_batch), fill = TRUE)
+} else {
+    final_dt <- final_batch
+}
+
+                                        # Save progress
+fwrite(final_dt, final_file)
 
 message("Scraping complete! Rows: ", nrow(final_dt), ", Columns: ", ncol(final_dt))
 
