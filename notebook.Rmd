@@ -70,27 +70,3 @@ write.csv(ethno_table, file = "data/ethno_table.csv", row.names = FALSE)
 
 
 
-# ethnobotany-resources
-
-<!-- badges: start -->
-<!-- badges: end -->
-
-The goal of ethnobotany-resources is to collect datasets, field notes, and literature references for plants used in traditional medicine and cultural
-practices.
-
-# Ethnobotanical Resources
-
-This repository collects datasets, field notes, and literature references  for plants used in traditional medicine and cultural practices.
-
-```{r echo=FALSE, message=FALSE}
-
-library(knitr)
-
-# Load the data from your repo
-databases <- read.csv("data/ethnobotanical_databases.csv")
-
-# Render as a black-and-white Markdown table
-kable(databases, format = "markdown", align = "l")
-knitr::opts_knit$set(root.dir = "C:/Users/Stacy/OneDrive/Desktop/ethnobotany-resources2")
-
-```
