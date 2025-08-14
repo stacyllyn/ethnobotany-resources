@@ -2,22 +2,10 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
-# Scraping BM-EB
-
-```{r scrape-bmeb}
-
-# --- Install required packages only if missing ---
-
-packages <- c("rvest", "xml2", "dplyr")
+packages <- c("rvest", "xml2", "dplyr", "rmarkdown")
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -26,6 +14,21 @@ install_if_missing <- function(pkg) {
 }
 
 invisible(lapply(packages, install_if_missing))
+
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+# Scraping BM-EB
+
+```{r scrape-bmeb}
+
+# --- Install required packages only if missing ---
+
 
 # --- Load libraries ---
 library(rvest)
