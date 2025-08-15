@@ -5,8 +5,8 @@ output: github_document
 
 ```{r, include = FALSE}
 
-packages <- c("rvest", "xml2", "dplyr", "purrr", "stringr"
-              "rmarkdown", "knitr")
+packages <- c("rvest", "xml2", "dplyr", "purrr", "stringr",
+              "rmarkdown", "knitr", "xml2", "data.table")
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -15,7 +15,7 @@ install_if_missing <- function(pkg) {
 }
 
 invisible(lapply(packages, install_if_missing))
-
+invisible(lapply(packages, library, character.only = TRUE))
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -30,15 +30,6 @@ knitr::opts_chunk$set(
 
 # --- Install required packages only if missing ---
 
-
-# --- Load libraries ---
-library(rvest)
-library(purrr)
-library(dplyr)
-library(stringr)
-library(rvest)
-library(xml2)
-library(dplyr)
 
 # --- Define the URL ---
 url <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=1"
@@ -77,8 +68,6 @@ write.csv(ethno_table, file = "data/ethno_table.csv", row.names = FALSE)
 
 ```{r bmeb-table}
 
-library(knitr)
-
 bmeb <- read.csv("data/ethno_table.csv")
 
 kable(bmeb, caption = "Ethnobotany plants in Bishop Museum")
@@ -99,14 +88,6 @@ Currently should have the following functionality:
 * Can resume if interrupted.
 
 ```{r crawl}
-
-# Install/load packages
-pkgs <- c("rvest", "data.table", "purrr", "stringr")
-sapply(pkgs, function(p) if (!requireNamespace(p, quietly = TRUE)) install.packages(p))
-library(rvest)
-library(data.table)
-library(purrr)
-library(stringr)
 
                                         # Base URL (pagination placeholder)
 base_url_template <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=%d"
