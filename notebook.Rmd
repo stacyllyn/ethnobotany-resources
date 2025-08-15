@@ -93,8 +93,8 @@ Currently should have the following functionality:
 base_url_template <- "https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=list&o=%d"
 
                                         # Output files for resume
-depth1_file <- "ethnobotany_depth1_progress.csv"
-final_file  <- "ethnobotany_full_normalized.csv"
+depth1_file <- "data/ethnobotany_depth1_progress.csv"
+final_file  <- "data/ethnobotany_full_normalized.csv"
 
                                         # ---- Step 1: Load existing depth-1 data if resuming ----
 if (file.exists(depth1_file)) {
@@ -211,7 +211,7 @@ if (!is.null(final_dt)) {
                                         # Save progress
 fwrite(final_dt, final_file)
 
-message("Scraping complete! Rows: ", nrow(final_dt), ", Columns: ", ncol(final_dt))
+
 
 ```
 
