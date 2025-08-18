@@ -10,7 +10,7 @@ packages <- c("rvest", "xml2", "dplyr", "purrr", "stringr",
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
+    install.packages(pkg, type = "binary")
   }
 }
 
