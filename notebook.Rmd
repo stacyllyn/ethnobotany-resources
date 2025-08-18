@@ -10,11 +10,11 @@ packages <- c("rvest", "xml2", "dplyr", "purrr", "stringr",
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg, type = "binary")
+    install.packages(pkg)
   }
 }
 
-invisible(lapply(packages, install_if_missing))
+xinvisible(lapply(packages, install_if_missing))
 invisible(lapply(packages, library, character.only = TRUE))
 
 knitr::opts_chunk$set(
