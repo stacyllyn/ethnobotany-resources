@@ -14,7 +14,7 @@ install_if_missing <- function(pkg) {
   }
 }
 
-xinvisible(lapply(packages, install_if_missing))
+invisible(lapply(packages, install_if_missing))
 invisible(lapply(packages, library, character.only = TRUE))
 
 knitr::opts_chunk$set(
