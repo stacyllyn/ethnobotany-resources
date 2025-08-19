@@ -1,6 +1,13 @@
 ---
-output: github_document
+
+output: html_document
+
 ---
+
+# A note on dependencies
+
++ Leaflet requires installing external dependencies
+  + See https://rspatial.github.io/terra/
 
 
 ```{r, include = FALSE}
