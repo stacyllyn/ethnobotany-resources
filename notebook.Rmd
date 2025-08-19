@@ -32,6 +32,23 @@ knitr::opts_chunk$set(
 
 ```
 	
+
+
+# DEMO: Leaflet map
+
+```{r leaf-map}
+
+# Create a leaflet map widget
+leaflet() %>%
+  # Add default OpenStreetMap tiles to the map
+  addTiles() %>%
+  # Set the initial view of the map
+  setView(lng = -157.858333, lat = 21.306944, zoom = 10) %>%
+  # Add a marker for a specific location (Honolulu)
+  addMarkers(lng = -157.858333, lat = 21.306944, popup = "Aloha from Honolulu! 🌺")
+
+```
+
 # Scraping BM-EB
 
 ```{r scrape-bmeb}
@@ -440,17 +457,3 @@ depth2_wide
 ```
 
 
-# Leaflet map
-
-```{r leaf-map}
-
-# Create a leaflet map widget
-leaflet() %>%
-  # Add default OpenStreetMap tiles to the map
-  addTiles() %>%
-  # Set the initial view of the map
-  setView(lng = -157.858333, lat = 21.306944, zoom = 10) %>%
-  # Add a marker for a specific location (Honolulu)
-  addMarkers(lng = -157.858333, lat = 21.306944, popup = "Aloha from Honolulu! 🌺")
-
-```
