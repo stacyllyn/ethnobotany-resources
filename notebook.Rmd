@@ -1,12 +1,20 @@
 ---
-output: github_document
+
+output: html_document
+
 ---
+
+# A note on dependencies
+
++ Leaflet requires installing external dependencies
+  + See https://rspatial.github.io/terra/
 
 
 ```{r, include = FALSE}
 
 packages <- c("rvest", "xml2", "dplyr", "purrr", "stringr",
-              "rmarkdown", "knitr", "xml2", "data.table", "httr")
+              "rmarkdown", "knitr", "xml2", "data.table", "httr",
+              "leaflet")
 
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -24,6 +32,23 @@ knitr::opts_chunk$set(
 
 ```
 	
+
+
+# DEMO: Leaflet map
+
+```{r leaf-map}
+
+# Create a leaflet map widget
+leaflet() %>%
+  # Add default OpenStreetMap tiles to the map
+  addTiles() %>%
+  # Set the initial view of the map
+  setView(lng = -157.858333, lat = 21.306944, zoom = 10) %>%
+  # Add a marker for a specific location (Honolulu)
+  addMarkers(lng = -157.858333, lat = 21.306944, popup = "Aloha from Honolulu! 🌺")
+
+```
+
 # Scraping BM-EB
 
 ```{r scrape-bmeb}
@@ -430,4 +455,5 @@ print(sort(found_cols))
 depth2_wide
 
 ```
+
 
