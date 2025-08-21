@@ -41,6 +41,5 @@ df <- tibble(
 )
 
 
-write.csv(df, "plants.csv", row.names = FALSE)
-
+write.csv(df, "data/plant_propagation.csv", row.names = FALSE)
 ```
