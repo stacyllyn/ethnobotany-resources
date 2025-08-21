@@ -455,5 +455,555 @@ print(sort(found_cols))
 depth2_wide
 
 ```
+Prompt 1: please write me an r markdown workflow for using r scripts to webscrape ethnobotanical websites for hawaiian plants
+
+Output:
+---
+title: "Ethnobotanical Webscraping for Hawaiian Plants"
+author: "Your Name"
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    df_print: paged
+params:
+  species:
+    value: ["Hibiscus brackenridgei", "Sesbania tomentosa", "ʻIlima", "Milo"]
+  cache_dir:
+    value: "cache"
+  out_dir:
+    value: "data"
+  polite_delay_sec:
+    value: 4
+  user_agent:
+    value: "UH ethnobotany research (contact: you@example.org)"
+  # Toggle which sources to use
+  use_wikipedia:
+    value: true
+  use_nativeplants_hawaii:
+    value: true
+  use_custom_sites:
+    value: false
+knitr::opts_chunk$set(
+  echo = TRUE, message = TRUE, warning = TRUE, comment = "#>"
+)
+ # Packages 
+need <- c(
+  "rvest", "polite", "robotstxt", "xml2", "httr2",
+  "stringr", "purrr", "dplyr", "tidyr", "tibble",
+  "janitor", "readr", "arrow", "glue", "progressr"
+)
+installed <- rownames(installed.packages())
+to_get <- setdiff(need, installed)
+if (length(to_get)) install.packages(to_get)
+
+library(rvest); library(polite); library(robotstxt); library(xml2)
+library(httr2)
+library(stringr); library(purrr); library(dplyr); library(tidyr); library(tibble)
+library(janitor); library(readr); library(arrow); library(glue); library(progressr)
+
+# Output plan
+empty_row <- tibble(
+  species_query      = character(),
+  species_detected   = character(),
+  common_names       = character(),
+  hawaiian_names     = character(),
+  scientific_name    = character(),
+  family             = character(),
+  parts_used         = character(),
+  uses_food          = character(),
+  uses_medicinal     = character(),
+  uses_material      = character(),
+  cultural_notes     = character(),
+  habitat_notes      = character(),
+  conservation_notes = character(),
+  source_site        = character(),
+  source_url         = character(),
+  retrieved_at       = character()
+)
+
+# Scrape runner
+species <- params$species
+
+scrapers <- list(
+  Wikipedia = scrape_wikipedia,
+  NPH = scrape_nativeplants_hawaii
+)
+
+if (!params$use_wikipedia) scrapers$Wikipedia <- NULL
+if (!params$use_nativeplants_hawaii) scrapers$NPH <- NULL
+
+if (params$use_custom_sites && nrow(custom_sites)) {
+  for (i in seq_len(nrow(custom_sites))) {
+    row <- custom_sites[i,]
+    scrapers[[row$site_name]] <- function(q) scrape_custom_site(q, row)
+  }
+}
+
+results <- empty_row
+handlers(global = TRUE)
+with_progress({
+  p <- progressor(along = species)
+  for (spq in species) {
+    for (sc in scrapers) {
+      df <- tryCatch(sc(spq), error = function(e) NULL)
+      if (!is.null(df)) results <- bind_rows(results, df)
+    }
+    p()
+  }
+})
+
+results
+
+# Post processing
+results <- results %>% clean_names()
+summary_tbl <- results %>% count(species_query, source_site, sort = TRUE)
+summary_tbl
+
+# Export 
+csv_path <- file.path(params$out_dir, "ethnobotany_scrape.csv")
+parquet_path <- file.path(params$out_dir, "ethnobotany_scrape.parquet")
+
+write_csv(results, csv_path, na = "")
+arrow::write_parquet(results, parquet_path)
+
+cat("Saved:\n",
+    "- CSV:", csv_path, "\n",
+    "- Parquet:", parquet_path, "\n")
+
+Prompt 2: please help me write r scripts to webscrape from this website: http://nativeplants.hawaii.edu/plant/index/
+
+# install.packages(c("rvest","httr","xml2","stringr","dplyr","purrr","tidyr","janitor","readr"))
+library(rvest)
+library(httr)
+library(xml2)
+library(stringr)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(janitor)
+library(readr)
+
+base <- "https://nativeplants.hawaii.edu"
+ua   <- "UH ethnobotany research (contact: you@example.org)"
+pause_sec <- 2.5
+
+# ---------- helpers ----------
+GET_html <- function(url) {
+  # be polite: identify and pause
+  Sys.sleep(pause_sec)
+  res <- httr::GET(url, httr::user_agent(ua), httr::timeout(20))
+  if (httr::http_error(res)) return(NULL)
+  read_html(httr::content(res, as = "text", encoding = "UTF-8"))
+}
+
+# pull absolute links from an index page
+extract_profile_links <- function(doc) {
+  if (is.null(doc)) return(character())
+  links <- html_elements(doc, "a") |> html_attr("href") |> unique()
+  # keep only plant profile links
+  links[grepl("^/plant/view/[^/]+/?$", links)]
+}
+
+# turn common “label: value” layouts (tables or dl lists) into a named list
+pull_kv <- function(doc) {
+  if (is.null(doc)) return(list())
+
+  # 2-col tables with th/td or td/td
+  kv_tbl <- doc |>
+    html_elements("table") |>
+    html_table(fill = TRUE) |>
+    keep(~ ncol(.x) >= 2) |>
+    map_dfr(~ setNames(.x[1:2], c("label","value")) |> select(1:2), .id = "tbl") |>
+    mutate(across(everything(), ~str_squish(as.character(.)))) |>
+    filter(label != "", !is.na(label))
+
+  # definition lists <dl><dt>label</dt><dd>value</dd>
+  dts <- html_elements(doc, "dl dt")
+  dds <- html_elements(doc, "dl dd")
+  kv_dl <- tibble(label = html_text2(dts), value = html_text2(dds)) |>
+    mutate(across(everything(), str_squish)) |>
+    filter(label != "", !is.na(label))
+
+  bind_rows(kv_tbl, kv_dl) |>
+    distinct(label, .keep_all = TRUE)
+}
+
+# parse a single profile page into a row
+parse_profile <- function(url) {
+  doc <- GET_html(url)
+  if (is.null(doc)) return(tibble())
+
+  title <- doc |> html_element("h1, h2") |> html_text2() |> str_squish()
+
+  # try to grab key info from obvious spots
+  family_guess <- doc |> html_elements("p, li, td, dd") |> html_text2()
+  family_guess <- family_guess[str_detect(family_guess, regex("^\\s*Family\\b", ignore_case = TRUE))] |> first()
+
+  # harvest any “label: value” blocks
+  kv <- pull_kv(doc)
+  kv_wide <- if (nrow(kv)) {
+    kv |>
+      mutate(label = tolower(label) |> str_replace_all("[^a-z0-9]+","_")) |>
+      pivot_wider(names_from = label, values_from = value)
+  } else tibble()
+
+  tibble(
+    source_url = url,
+    title = title,
+    family = family_guess %||% NA_character_
+  ) |>
+    bind_cols(kv_wide) |>
+    clean_names()
+}
+
+# crawl all index pages until no new profile links appear
+collect_all_profile_urls <- function(start_page = 1, max_pages = 60) {
+  urls <- character()
+  for (p in start_page:max_pages) {
+    idx_url <- if (p == 1) {
+      paste0(base, "/plant/index/")
+    } else {
+      paste0(base, "/plant/index/page/", p, "/")
+    }
+    message("Index: ", idx_url)
+    doc <- GET_html(idx_url)
+    if (is.null(doc)) break
+    found <- extract_profile_links(doc)
+    if (!length(found)) {
+      # if an index page yields nothing, assume we passed the end
+      if (p > 1) break
+    }
+    abs_found <- paste0(base, found)
+    urls <- unique(c(urls, abs_found))
+  }
+  urls
+}
+
+# ---------- run ----------
+profile_urls <- collect_all_profile_urls()
+length(profile_urls)
+head(profile_urls, 10)
+
+# scrape each profile (progress in console)
+plants <- map_dfr(profile_urls, safely(parse_profile, otherwise = tibble()) |> pluck("f"))
+glimpse(plants)
+
+# normalize a few common fields if present
+plants <- plants |>
+  mutate(
+    scientific_name = coalesce(`scientific_name`, title),
+    hawaiian_names  = coalesce(`hawaiian_names`, `hawaiian_name_s_`, `hawaiian_name`, `hawaiian`),
+    common_names    = coalesce(`common_names`, `common_name_s_`, `common_name`),
+    uses            = coalesce(`uses`, `ethnobotany`, `cultural_uses`, `cultural_notes`)
+  ) |>
+  relocate(source_url, title, scientific_name, hawaiian_names, common_names, family, uses)
+
+# save
+readr::write_csv(plants, "nativeplants_profiles.csv", na = "")
+
+Alternative scripts for prompt 2
+# install.packages(c("rvest","httr","xml2","stringr","dplyr","purrr","urltools","readr","janitor"))
+library(rvest); library(httr); library(xml2); library(stringr); library(dplyr)
+library(purrr); library(urltools); library(readr); library(janitor)
+
+base <- "https://nativeplants.hawaii.edu"
+ua   <- "UH ethnobotany research (contact: you@example.org)"
+pause_sec <- 2
+
+species_queries <- c("Metrosideros polymorpha", "Hibiscus brackenridgei", "Sesbania tomentosa", "ʻIlima")
+
+GET_html <- function(url) {
+  Sys.sleep(pause_sec)
+  res <- httr::GET(url, httr::user_agent(ua), httr::timeout(20))
+  if (httr::http_error(res)) return(NULL)
+  read_html(httr::content(res, as = "text", encoding = "UTF-8"))
+}
+
+search_once <- function(q) {
+  # The plant list page has search; simplest approach: hit /plant/?q=
+  s_url <- paste0(base, "/plant/?", urltools::param_set("", "q", q))
+  doc <- GET_html(s_url)
+  if (is.null(doc)) return(character())
+  # pick result links that look like profile pages
+  links <- html_elements(doc, "a") |> html_attr("href") |> unique()
+  links <- links[grepl("^/plant/view/[^/]+/?$", links)]
+  paste0(base, links)
+}
+
+parse_profile <- function(url) {
+  Sys.sleep(pause_sec)
+  res <- httr::GET(url, httr::user_agent(ua), httr::timeout(20))
+  if (httr::http_error(res)) return(tibble())
+  doc <- read_html(httr::content(res, as = "text", encoding = "UTF-8"))
+
+  title <- doc |> html_element("h1, h2") |> html_text2() |> str_squish()
+
+  # harvest generic labeled fields (tables or dl)
+  kv <- list()
+  # tables
+  tabs <- doc |> html_elements("table")
+  if (length(tabs)) {
+    kv[[length(kv)+1]] <- tabs |>
+      html_table(fill = TRUE) |>
+      keep(~ ncol(.x) >= 2) |>
+      map_dfr(~ setNames(.x[1:2], c("label","value")) |> select(1:2))
+  }
+  # dl
+  dts <- html_elements(doc, "dl dt")
+  dds <- html_elements(doc, "dl dd")
+  if (length(dts) && length(dds)) {
+    kv[[length(kv)+1]] <- tibble(label = html_text2(dts), value = html_text2(dds))
+  }
+
+  kv <- bind_rows(kv) |>
+    mutate(across(everything(), ~str_squish(as.character(.)))) |>
+    filter(label != "", !is.na(label))
+
+  kv_wide <- if (nrow(kv)) {
+    kv |>
+      mutate(label = tolower(label) |> str_replace_all("[^a-z0-9]+","_")) |>
+      distinct(label, .keep_all = TRUE) |>
+      pivot_wider(names_from = label, values_from = value)
+  } else tibble()
+
+  tibble(source_url = url, title = title) |>
+    bind_cols(kv_wide) |>
+    clean_names()
+}
+
+# run
+profile_urls <- species_queries |> map(search_once) |> unlist() |> unique()
+plants <- map_dfr(profile_urls, safely(parse_profile, otherwise = tibble()) |> pluck("f"))
+
+plants <- plants |>
+  mutate(
+    scientific_name = coalesce(scientific_name, title),
+    hawaiian_names  = coalesce(hawaiian_names, hawaiian_name_s_, hawaiian_name, hawaiian),
+    common_names    = coalesce(common_names, common_name_s_, common_name),
+    uses            = coalesce(uses, ethnobotany, cultural_uses, cultural_notes)
+  ) |>
+  relocate(source_url, title, scientific_name, hawaiian_names, common_names, uses)
+
+write_csv(plants, "nativeplants_targeted.csv", na = "")
+
+Prompt 3: please write me r scripts to webscrape and produce an archiver with html snapshots and csv from this link : https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa/home
+
+# install.packages(c("rvest","httr","xml2","stringr","dplyr","purrr","tidyr","readr","janitor","fs","urltools","digest"))
+library(rvest); library(httr); library(xml2); library(stringr); library(dplyr)
+library(purrr); library(tidyr); library(readr); library(janitor); library(fs)
+library(urltools); library(digest)
+
+# ----------------- CONFIG -----------------
+start_url <- "https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa"
+host_ok   <- "guides.library.kapiolani.hawaii.edu"
+path_root <- "/apdl/ahupuaa"      # keep crawl inside this guide
+ua        <- "UH ethnobotany research (contact: you@example.org)"
+pause_s   <- 1.5                  # be gentle
+out_dir   <- "apdl_ahupuaa_archive"
+dir_create(out_dir)
+dir_create(file.path(out_dir, "html"))
+
+# ----------------- HELPERS -----------------
+GET_text <- function(url) {
+  Sys.sleep(pause_s)
+  res <- httr::GET(url, user_agent(ua), timeout(20))
+  if (http_error(res)) return(NULL)
+  content(res, as = "text", encoding = "UTF-8")
+}
+
+abs_link <- function(base, href) {
+  if (is.na(href) || href == "") return(NA_character_)
+  url_absolute(href, base)
+}
+
+in_scope <- function(url) {
+  if (is.na(url)) return(FALSE)
+  p <- url_parse(url)
+  identical(p$domain, host_ok) && startsWith(p$path, path_root)
+}
+
+# Extract on-page links that point to other guide pages
+extract_links <- function(html_txt, base_url) {
+  if (is.null(html_txt)) return(character())
+  doc <- read_html(html_txt)
+  hrefs <- html_elements(doc, "a") |> html_attr("href") |> unique()
+  abs <- map_chr(hrefs, ~ abs_link(base_url, .x))
+  abs[map_lgl(abs, in_scope)] |> unique()
+}
+
+# Parse a LibGuides content page into a tidy row
+parse_page <- function(url, html_txt) {
+  if (is.null(html_txt)) return(tibble())
+
+  path <- file.path(out_dir, "html", paste0(digest(url), ".html"))
+  writeLines(html_txt, path, useBytes = TRUE)
+
+  doc <- read_html(html_txt)
+
+  # Titles & meta
+  title_tag <- doc |> html_element("title") |> html_text2() |> str_squish()
+  h1        <- doc |> html_element("h1, .s-lib-header-title, #s-lg-guide-name") |> html_text2() |> str_squish()
+
+  # Main content region (common LibGuides containers with fallbacks)
+  main_sel <- paste(
+    "#s-lg-guide-main",
+    ".s-lib-main",
+    "#s-lg-content-2",                # tabbed content sometimes uses these ids
+    ".s-lg-widget",                   # content boxes
+    "main",
+    sep = ","
+  )
+  main <- doc |> html_elements(main_sel)
+
+  # Gather text paragraphs and headings
+  headings <- main |> html_elements("h2, h3, h4") |> html_text2() |> str_squish()
+  paragraphs <- main |> html_elements("p, li") |> html_text2() |> str_squish()
+  body_text <- paragraphs[paragraphs != ""] |> paste(collapse = "\n")
+
+  # Try to find "Last Updated" and "Author/Contact" blocks (common in LibGuides footer/sidebars)
+  last_updated <- doc |> html_elements(xpath = "//*[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'last updated')]") |> html_text2()
+  last_updated <- last_updated[1] %||% NA_character_
+
+  contact <- doc |> html_elements(xpath = "//*[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'contact') or contains(., '@')]") |> html_text2()
+  contact <- contact |> str_squish() |> paste(collapse = " | ")
+  contact <- ifelse(contact == "", NA_character_, contact)
+
+  # Capture images and downloadable file links
+  imgs <- main |> html_elements("img") |> html_attr("src") |> unique()
+  imgs <- map_chr(imgs, ~ abs_link(url, .x))
+  files <- main |> html_elements("a[href]") |> html_attr("href") |> unique()
+  files <- map_chr(files, ~ abs_link(url, .x))
+
+  tibble(
+    url,
+    html_path = path,
+    title_tag = title_tag,
+    h1 = h1,
+    headings = paste(headings, collapse = " | "),
+    body_text = body_text,
+    image_urls = paste(na.omit(imgs), collapse = " | "),
+    file_links = paste(na.omit(files), collapse = " | "),
+    last_updated = last_updated,
+    contact_hint = contact
+  )
+}
+
+# ----------------- CRAWL -----------------
+seen <- character()
+queue <- start_url
+
+results <- list()
+
+while (length(queue)) {
+  current <- queue[1]
+  queue   <- queue[-1]
+  if (current %in% seen) next
+  seen <- c(seen, current)
+
+  message("Fetching: ", current)
+  txt <- GET_text(current)
+  if (is.null(txt)) next
+
+  # parse + store row
+  results[[length(results) + 1]] <- parse_page(current, txt)
+
+  # discover next links
+  nxt <- extract_links(txt, current)
+  # keep same-guide links, drop fragments/query variants we've already seen
+  nxt <- unique(nxt[!(nxt %in% seen)])
+  queue <- unique(c(queue, nxt))
+}
+
+pages <- bind_rows(results) |> clean_names()
+
+# Optional: remove boilerplate & super-long whitespace
+pages <- pages |>
+  mutate(
+    body_text = str_replace_all(body_text, "[ \t]+", " ") |> str_squish()
+  )
+
+# ----------------- EXPORT -----------------
+csv_path <- file.path(out_dir, "apdl_ahupuaa_archive.csv")
+write_csv(pages, csv_path, na = "")
+
+message("Saved CSV: ", csv_path)
+message("Saved HTML snapshots in: ", file.path(out_dir, "html"))
+
+# Alternative scripts for prompt 3
+
+# install.packages(c("rvest","httr","xml2","stringr","dplyr","purrr","readr","janitor","fs","digest","urltools"))
+library(rvest); library(httr); library(xml2); library(stringr); library(dplyr)
+library(purrr); library(readr); library(janitor); library(fs); library(digest); library(urltools)
+
+ua <- "UH ethnobotany research (contact: you@example.org)"
+pause_s <- 1.2
+out_dir <- "apdl_ahupuaa_focused"
+dir_create(out_dir)
+dir_create(file.path(out_dir, "html"))
+
+seed_urls <- c(
+  "https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa"  # Home
+  # Add more discovered tabs like:
+  # "https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa/flora",
+  # "https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa/fauna",
+  # "https://guides.library.kapiolani.hawaii.edu/apdl/ahupuaa/resources"
+)
+
+GET_text <- function(url) {
+  Sys.sleep(pause_s)
+  res <- httr::GET(url, user_agent(ua), timeout(20))
+  if (http_error(res)) return(NULL)
+  content(res, as = "text", encoding = "UTF-8")
+}
+
+abs_link <- function(base, href) ifelse(is.na(href) || href=="", NA_character_, url_absolute(href, base))
+
+parse_one <- function(url) {
+  message("Scraping: ", url)
+  txt <- GET_text(url)
+  if (is.null(txt)) return(tibble())
+  # snapshot
+  html_path <- file.path(out_dir, "html", paste0(digest(url), ".html"))
+  writeLines(txt, html_path, useBytes = TRUE)
+
+  doc <- read_html(txt)
+  title_tag <- doc |> html_element("title") |> html_text2() |> str_squish()
+  h1 <- doc |> html_element("h1, .s-lib-header-title, #s-lg-guide-name") |> html_text2() |> str_squish()
+
+  main_sel <- "#s-lg-guide-main, .s-lib-main, #s-lg-content-2, main"
+  main <- doc |> html_elements(main_sel)
+
+  # Pull structured bits
+  boxes <- main |> html_elements(".s-lib-box, .s-lg-box, .box, section")
+  box_titles <- boxes |> html_elements(".s-lib-box-title, h2, h3") |> html_text2() |> str_squish()
+  lists <- main |> html_elements("ul li, ol li") |> html_text2() |> str_squish()
+  paras <- main |> html_elements("p") |> html_text2() |> str_squish()
+
+  imgs <- main |> html_elements("img") |> html_attr("src") |> unique()
+  imgs <- map_chr(imgs, ~ abs_link(url, .x))
+  files <- main |> html_elements("a[href]") |> html_attr("href") |> unique()
+  files <- map_chr(files, ~ abs_link(url, .x))
+
+  last_updated <- doc |> html_elements(xpath = "//*[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'last updated')]") |> html_text2()
+  last_updated <- last_updated[1] %||% NA_character_
+
+  tibble(
+    url, html_path, title_tag, h1,
+    box_titles = paste(box_titles, collapse = " | "),
+    list_items = paste(lists, collapse = " | "),
+    paragraphs = paste(paras, collapse = "\n"),
+    image_urls = paste(na.omit(imgs), collapse = " | "),
+    file_links = paste(na.omit(files), collapse = " | "),
+    last_updated
+  )
+}
+
+pages <- map_dfr(seed_urls, parse_one) |> clean_names()
+csv_path <- file.path(out_dir, "apdl_ahupuaa_focused.csv")
+write_csv(pages, csv_path, na = "")
+message("Saved CSV: ", csv_path)
+message("Saved HTML snapshots in: ", file.path(out_dir, "html"))
 
 
