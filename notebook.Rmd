@@ -245,7 +245,7 @@ final_dt[["depth"]] <- rep(2, dim(final_dt)[1])
 
 
 # Depth 2 Crawler
-
+## Takes a very long time, consider runnign chunks separately
 
 ```{r scrape-details-from-finaldt, eval=TRUE}
 
@@ -272,7 +272,7 @@ extract_bold_fields <- function(url) {
 # Use URLs from final_dt
 detail_urls <- final_dt$URL
 
-# Scrape all detail pages (limit for demo, e.g. first 10)
+# Scrape all detail pages TODO: implement parallel processing 
 detail_data <- purrr::map(detail_urls, extract_bold_fields, .progress = TRUE)
 
 # Convert to data.frame
