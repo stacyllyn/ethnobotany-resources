@@ -4431,6 +4431,20 @@ pre code {
 </ul></li>
 </ul>
 </div>
+<div id="demo-leaflet-map" class="section level1">
+<h1>DEMO: Leaflet map</h1>
+<pre class="r"><code>
+# Create a leaflet map widget
+leaflet() %&gt;%
+  # Add default OpenStreetMap tiles to the map
+  addTiles() %&gt;%
+  # Set the initial view of the map
+  setView(lng = -157.858333, lat = 21.306944, zoom = 10) %&gt;%
+  # Add a marker for a specific location (Honolulu)
+  addMarkers(lng = -157.858333, lat = 21.306944, popup = &quot;Aloha from Honolulu! 🌺&quot;)</code></pre>
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-8ea28316ea1fba43b4fd" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-8ea28316ea1fba43b4fd">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[21.306944,-157.858333,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Aloha from Honolulu! 🌺",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[21.306944,-157.858333],10,[]],"limits":{"lat":[21.306944,21.306944],"lng":[-157.858333,-157.858333]}},"evals":[],"jsHooks":[]}</script>
+</div>
 <div id="scraping-bm-eb" class="section level1">
 <h1>Scraping BM-EB</h1>
 <pre class="r"><code>
@@ -4457,9 +4471,9 @@ ethno_table &lt;- tables[[1]] %&gt;% html_table(fill = TRUE)
 glimpse(ethno_table)
 #&gt; Rows: 145
 #&gt; Columns: 3
-#&gt; $ `Hawaiian Name`   &lt;chr&gt; &quot;‘a‘ali‘i&quot;, &quot;a‘e (Sapindus)&quot;, &quot;a‘e (Zanthoxylem)…
-#&gt; $ `Scientific Name` &lt;chr&gt; &quot;Dodonaea viscosa&quot;, &quot;Sapindus saponaria&quot;, &quot;Zanth…
-#&gt; $ `Vernacular Name` &lt;chr&gt; &quot;none&quot;, &quot;soapberry&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;se…
+#&gt; $ `Hawaiian Name`   &lt;chr&gt; &quot;‘a‘ali‘i&quot;, &quot;a‘e (Sapindus)&quot;, &quot;a‘e (Zanthoxylem)&quot;, &quot;‘ahakea&quot;, &quot;‘āheahea&quot;, &quot;‘ahu‘awa&quot;, &quot;aiea&quot;, &quot;‘aka‘akai&quot;, &quot;‘ākala…
+#&gt; $ `Scientific Name` &lt;chr&gt; &quot;Dodonaea viscosa&quot;, &quot;Sapindus saponaria&quot;, &quot;Zanthoxylum (4 species)&quot;, &quot;Bobea (4 species)&quot;, &quot;Chenopodium oahuense&quot;, …
+#&gt; $ `Vernacular Name` &lt;chr&gt; &quot;none&quot;, &quot;soapberry&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;sedge&quot;, &quot;none&quot;, &quot;great bulrush&quot;, &quot;Hawaiian raspberry&quot;, &quot;none&quot;, &quot;spur…
 
 # Optional: View first rows
 head(ethno_table)
@@ -5375,246 +5389,144 @@ final_dt[[&quot;depth&quot;]] &lt;- rep(2, dim(final_dt)[1])
 <div id="depth-2-crawler" class="section level1">
 <h1>Depth 2 Crawler</h1>
 <pre class="r"><code>
-# Text helpers
-clean_txt &lt;- function(x) {
-  x &lt;- gsub(&quot;\u00A0&quot;, &quot; &quot;, x)          # NBSP -&gt; space
-  x &lt;- gsub(&quot;\\s+&quot;, &quot; &quot;, x)
-  stringr::str_squish(x)
-}
-esc_re &lt;- function(x) gsub(&quot;([][{}()+*^$|?.\\-\\\\])&quot;, &quot;\\\\\\1&quot;, x)
-
-# Canonical label mapping (extend as needed)
-canon_label &lt;- function(label) {
-  L &lt;- tolower(clean_txt(gsub(&quot;[:]+\\s*$&quot;, &quot;&quot;, label)))
-  patterns &lt;- list(
-    &quot;Hawaiian Name(s)&quot; = &quot;^hawaiian\\s+name(s)?$&quot;,
-    &quot;Scientific Name&quot;  = &quot;^scientific\\s+name$|^species$|^binomial$|^taxon$&quot;,
-    &quot;Vernacular Name&quot;  = &quot;^vernacular\\s+name(s)?$|^common\\s+name(s)?$|^english\\s+name(s)?$&quot;,
-    &quot;Family&quot;           = &quot;^family$&quot;,
-    &quot;Status&quot;           = &quot;^status$|^native\\s*status$|^endemic( status)?$&quot;,
-    &quot;Part Used&quot;        = &quot;^part(s)?\\s+used$&quot;,
-    &quot;Uses&quot;             = &quot;^use(s)?$|^traditional\\s+use(s)?$|^uses(/|\\s+)practices$&quot;,
-    &quot;Medicinal&quot;        = &quot;^medicinal$|^medicine$&quot;,
-    &quot;Habitat&quot;          = &quot;^habitat$&quot;,
-    &quot;Distribution&quot;     = &quot;^distribution$|^location(s)?$|^island(s)?$&quot;,
-    &quot;References&quot;       = &quot;^reference(s)?$|^sources?$&quot;,
-    &quot;Notes&quot;            = &quot;^note(s)?$|^remarks$&quot;
-  )
-  for (k in names(patterns)) if (grepl(patterns[[k]], L, perl = TRUE)) return(k)
-  # Fallback: keep original label (trimmed)
-  sub(&quot;:\\s*$&quot;, &quot;&quot;, clean_txt(label))
-}
-
-# Extract label/value pairs from a content node
-extract_fields &lt;- function(content_node) {
+# Helper to extract &lt;b&gt;Label&lt;/b&gt;: Value pairs from a detail page
+extract_bold_fields &lt;- function(url) {
+  page &lt;- tryCatch(read_html(url), error = function(e) return(NULL))
+  if (is.null(page)) return(list())
+  
+  name_div &lt;- page %&gt;% html_node(&quot;div#name&quot;)
+  if (is.na(name_div)) return(list())
+  
+  b_nodes &lt;- name_div %&gt;% html_nodes(&quot;b&quot;)
+  
   fields &lt;- list()
-  addf &lt;- function(label, value) {
-    lbl &lt;- canon_label(label)
-    val &lt;- clean_txt(value)
-    if (!nzchar(lbl) || !nzchar(val)) return(invisible())
-    if (is.null(fields[[lbl]])) fields[[lbl]] &lt;- val
-    else fields[[lbl]] &lt;- paste(fields[[lbl]], val, sep = &quot;\n&quot;)
+  for (b in b_nodes) {
+    label &lt;- b %&gt;% html_text(trim=TRUE)
+    value &lt;- b %&gt;% html_nodes(xpath = &quot;following-sibling::text()[1]&quot;) %&gt;% html_text(trim=TRUE)
+    value &lt;- sub(&quot;^\\s*:\\s*&quot;, &quot;&quot;, value)
+    fields[[make.names(label)]] &lt;- value
   }
-
-  # 1) Definition lists: &lt;dt&gt;Label&lt;/dt&gt;&lt;dd&gt;Value&lt;/dd&gt;
-  for (dl in rvest::html_elements(content_node, &quot;dl&quot;)) {
-    dts &lt;- rvest::html_elements(dl, &quot;dt&quot;); dds &lt;- rvest::html_elements(dl, &quot;dd&quot;)
-    n &lt;- min(length(dts), length(dds))
-    for (i in seq_len(n)) addf(rvest::html_text2(dts[[i]]), rvest::html_text2(dds[[i]]))
-  }
-
-  # 2) Tables: assume first cell is label, rest are value
-  for (tbl in rvest::html_elements(content_node, &quot;table&quot;)) {
-    for (tr in rvest::html_elements(tbl, &quot;tr&quot;)) {
-      cells &lt;- rvest::html_elements(tr, &quot;th, td&quot;)
-      if (length(cells) &gt;= 2) {
-        label &lt;- rvest::html_text2(cells[[1]])
-        vals &lt;- vapply(cells[-1], rvest::html_text2, &quot;&quot;, USE.NAMES = FALSE)
-        vals &lt;- vals[nzchar(vals)]
-        if (length(vals)) addf(label, paste(vals, collapse = &quot; | &quot;))
-      }
-    }
-  }
-
-  # 3) Bold/strong label at start of paragraph/list item
-  for (parent in rvest::html_elements(content_node, &quot;p, li&quot;)) {
-    b &lt;- rvest::html_element(parent, &quot;strong, b&quot;)
-    if (!inherits(b, &quot;xml_missing&quot;) &amp;&amp; length(b) &gt; 0) {
-      label &lt;- clean_txt(rvest::html_text2(b))
-      par_txt &lt;- rvest::html_text2(parent)
-      if (nzchar(label) &amp;&amp; nzchar(par_txt)) {
-        pattern &lt;- paste0(&quot;^\\s*&quot;, esc_re(label), &quot;\\s*:?\\s*&quot;)
-        value &lt;- clean_txt(sub(pattern, &quot;&quot;, par_txt, perl = TRUE))
-        if (nzchar(value)) addf(label, value)
-      }
-    }
-  }
-
-  # 4) Plain &quot;Label: Value&quot; lines (no bold)
-  known_left &lt;- c(&quot;Hawaiian Name&quot;, &quot;Hawaiian Name(s)&quot;, &quot;Scientific Name&quot;, &quot;Vernacular Name&quot;,
-                  &quot;Common Name&quot;, &quot;English Name&quot;, &quot;Family&quot;, &quot;Status&quot;, &quot;Part Used&quot;, &quot;Uses&quot;,
-                  &quot;Medicinal&quot;, &quot;Habitat&quot;, &quot;Distribution&quot;, &quot;References&quot;, &quot;Notes&quot;)
-  left_re &lt;- paste0(&quot;^\\s*(&quot;, paste(unique(known_left), collapse=&quot;|&quot;), &quot;)\\s*:\\s*(.+)$&quot;)
-  for (node in rvest::html_elements(content_node, &quot;p, li, div&quot;)) {
-    txt &lt;- rvest::html_text2(node)
-    if (!nzchar(txt)) next
-    m &lt;- regexec(left_re, txt, ignore.case = TRUE)
-    rr &lt;- regmatches(txt, m)[[1]]
-    if (length(rr) &gt;= 3) addf(rr[2], rr[3])
-  }
-
-  fields
+  return(fields)
 }
 
-# Choose content container
-choose_content_node &lt;- function(doc, selectors = c(&quot;#content&quot;,&quot;div#content&quot;,&quot;#main&quot;,&quot;main&quot;,&quot;article&quot;,&quot;.content&quot;,&quot;#mw-content-text&quot;,&quot;body&quot;)) {
-  for (sel in selectors) {
-    node &lt;- rvest::html_element(doc, sel)
-    if (!inherits(node, &quot;xml_missing&quot;) &amp;&amp; length(node) &gt; 0) return(node)
-  }
-  rvest::html_element(doc, &quot;body&quot;)
-}
+# Use URLs from final_dt
+detail_urls &lt;- final_dt$URL
 
-# Scrape one URL -&gt; one-row data.table (wide)
-scrape_one &lt;- function(url,
-                       ua = &quot;ethnobotany-resources/0.1 (+https://github.com/stacyllyn/ethnobotany-resources)&quot;,
-                       timeout_sec = 30) {
-  safe_row &lt;- function(error = NA_character_, status = NA_integer_, title = NA_character_) {
-    data.table(url = url, page_title = title, status = status,
-               fetched_at = Sys.time(), error = error)
-  }
+# Scrape all detail pages (limit for demo, e.g. first 10)
+detail_data &lt;- purrr::map(detail_urls[1:10], extract_bold_fields)
 
-  resp &lt;- tryCatch(httr::GET(url, httr::user_agent(ua), httr::timeout(timeout_sec)), error = identity)
-  if (inherits(resp, &quot;error&quot;)) return(safe_row(paste(&quot;request_error:&quot;, resp$message)))
-  status &lt;- httr::status_code(resp)
-  if (status &gt;= 400) return(safe_row(paste(&quot;http_status&quot;, status), status = status))
+# Convert to data.frame
+details_df &lt;- rbindlist(detail_data, fill=TRUE)
 
-  html_txt &lt;- tryCatch(httr::content(resp, as = &quot;text&quot;, encoding = &quot;UTF-8&quot;), error = identity)
-  if (inherits(html_txt, &quot;error&quot;) || !nzchar(html_txt)) return(safe_row(&quot;empty_response&quot;, status = status))
+# Preview
+head(details_df)
+#&gt;                                                                    Hawaiian.Name.s.         Scientific.Name Vernacular.Name         Family
+#&gt;                                                                              &lt;char&gt;                  &lt;char&gt;          &lt;char&gt;         &lt;char&gt;
+#&gt; 1:                       ‘a‘ali‘i, ‘a‘ali‘i kū makani, ‘a‘ali‘i kū ma kua, kumakani        Dodonaea viscosa            none    Sapindaceae
+#&gt; 2:                                                                      a‘e, mānele      Sapindus saponaria       soapberry    Sapindaceae
+#&gt; 3:                                                               a‘e, mānele, hea‘e Zanthoxylum (4 species)            none       Rutaceae
+#&gt; 4:                                                      ‘ahakea, ‘ahakea lau li‘i (       Bobea (4 species)            none      Rubiaceae
+#&gt; 5: ‘āheahea, ‘ahea, ‘āhewahewa, alaweo, alaweo huna (Ni‘ihau), ‘āweoweo, kāha‘iha‘i    Chenopodium oahuense            none Chenopodiaceae
+#&gt; 6:                                                               ‘ahu‘awa, ‘ehu‘awa       Cyperus javanicus           sedge     Cyperaceae
+#&gt;        Status      Authority
+#&gt;        &lt;char&gt;         &lt;char&gt;
+#&gt; 1: indigenous          Jacq.
+#&gt; 2: indigenous             L.
+#&gt; 3:    endemic               
+#&gt; 4:    endemic               
+#&gt; 5:    endemic (Meyen) Aellen
+#&gt; 6: indigenous         Houtt.
+#&gt;                                                                                                          Description
+#&gt;                                                                                                               &lt;char&gt;
+#&gt; 1:                                                                                                       Shrub/tree.
+#&gt; 2:                                                                           Tree, up to 25 m tall; bark pale brown.
+#&gt; 3:                                                                Small tree to 3-6 m tall, bark gray to dark brown.
+#&gt; 4: Trees, all 4 species up to 10 m tall, wood is a dull orange-brown &amp; becomes dark gold when rubbed with kukui oil.
+#&gt; 5:                                                                      Lightly scented shrubs, sometimes tree-like.
+#&gt; 6:                                                                                   Tall perennials 50-150 cm tall.
+#&gt;                                                                                                                                                                      Habitat
+#&gt;                                                                                                                                                                       &lt;char&gt;
+#&gt; 1: Found on open sites, ridges, lava, low pastures, shrublands, dry to mesic and wet forest, and subalpine shrubland, 3–2347 m on all main islands except Kaho‘olawe (Wagner
+#&gt; 2:                                                                                       Occurs in mesic forest 900–1370 m (Hualalai, Mauna Loa, &amp; Kilauea, Hawai‘i) (Wagner
+#&gt; 3:                                                                                                                                                                          
+#&gt; 4:                                                                                                                                                                          
+#&gt; 5:                       Occuring as a common or occasional element of dry habitats, ranging from 0–2520 m from coastal zones to  dry forest and subalpine shrubland (Wagner
+#&gt; 6:                                                 Common in marshy areas, stream banks, loi kalo, rocky coasts, and cliffs 0-460  m on most main islands and Midway (Wagner
+#&gt;                                                                                                                                                               Medicines
+#&gt;                                                                                                                                                                  &lt;char&gt;
+#&gt; 1:                                                                                           In a treatment termed holoina, ‘a‘ali‘i leaves are mixed with ala‘a bark (
+#&gt; 2:                                                                                                                                                                     
+#&gt; 3:                                                                                                                                                                     
+#&gt; 4:                                                                                  In a treatment for abcesses ‘ahakea bark is ground with puakala ku kula root bark (
+#&gt; 5: This plant is used to treat ‘ea (thrush, etc.) and pa‘ao‘ao (ailments). The leaf buds are used to treat children; the bark is ingested [sometimes with niu (coconut,
+#&gt; 6:                                                                           To treat ‘ea in children, ‘ahu‘awa stems and flowers are used with green kukui fruit sap (
+#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                       Non.Medicinal.Uses
+#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                   &lt;char&gt;
+#&gt; 1: Wood is hard, heavy, durable; sometimes used for houseposts and spears; many uses for fruits, such as a medicine, dye, and in lei, flowers also used in lei (Abbott 1992:68; Krauss 1993:65; Little &amp; Skolmen 1989:180; Malo 1951:21). Pioneer species (Lamb 1981:78); made into &quot;bait sticks&quot;, these were shaped and then charred in the fire (Krauss 1993:45). In the Ethnology Collection at Bishop Museum there is a post-contact example of the wood made into a
+#&gt; 2:                                                                                                                                                                                                                                                                                                                                                       Seeds strung into lei and necklaces (Krauss 1993:78). Hard wood used for spears &amp; other purposes (Malo 1951:22)
+#&gt; 3:                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+#&gt; 4:                                                                                                                                                                                           Yellow wood used for canoes; most favored for gunwales (Krauss 1993:50), poi pounding boards, canoe paddles (Malo 1951:20), and door and door–frames (Krauss 1993:57). In the Ethnology Collection at Bishop Museum there is a post-contact example of the wood made into a
+#&gt; 5:                                                                                                                                                                                 Leaves cooked and eaten as greens (Hillebrande 1888:380; Malo 1951:23). Part of composite fish hooks (Kamakau 1976:77; Krauss 1993:43) &quot;The kahuna ho‘omanamana called this plant ‘iloe holokula, because it was used everywhere to induce death…[also used] with the ‘ākia lau nui (
+#&gt; 6:                                                                                                                                                                                                                                                                                                                                                                                                                       This indigenous plant was often cultivated. The
+#&gt;    Specific.gravity.of.wood Famous.Locations                                                                         Mele
+#&gt;                      &lt;char&gt;           &lt;char&gt;                                                                       &lt;char&gt;
+#&gt; 1:                  unknown                  &quot;Hoa pili o ke ‘a‘ali‘i.&quot; line in &quot;Sweet Lei Mamo&quot; (Elbert &amp; Mahoe 1970:92).
+#&gt; 2:                      0.8                                                                                              
+#&gt; 3:                  unknown                                                                                              
+#&gt; 4:                  unknown                                                                                              
+#&gt; 5:                  unknown                                                                                              
+#&gt; 6:                  unknown                                                                                              
+#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       X.Ōlelo.Noeau
+#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              &lt;char&gt;
+#&gt; 1: [I] He ‘a‘ali‘i ku makani mai au; ‘a‘ohe makani nana e kula‘i. I am a wind-resting ‘a‘ali‘i; no gale can push me over. A boast meaning &quot;I can hold my own even in the face of difficulities.&quot; The ‘a‘ali‘i bush can stand the worst of gales, twisting and bending but seldom breaking off or falling over. [II] He hina na ka ‘a‘ali‘i kumakani, he ‘ula‘a pu me ka lepo.  When the wind-resting ‘a‘ali‘i falls, it lifts the sod up with its roots. A boast: When I, a powerful man, fall, others will fall with me. [III] He iki ‘a‘ali‘i ku makani o Pi‘iholo. A small, wind-resting ‘a‘ali‘i bush of Pi‘iholo. A small but powerful person.
+#&gt; 2:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+#&gt; 3:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+#&gt; 4:                                                                                                                                                                                                                                                                                                                                                                                                                                                                         I ke aha ho‘i?  I ka ‘ahakea!  Why? The ‘ahakea!  A saucy retort to the question &quot;Why?&quot;  A play on aha (why) and ‘aha in the word ‘ahakea. The ‘ahakea is a native tree.
+#&gt; 5:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+#&gt; 6:                                                                                                                                                                                                                            [I] Aia aku la paha i Waikiki i ka ‘imi ‘ahu‘awa. Perhaps gone to Waikiki to seek the ‘ahu‘awa sedge. Gone where disappointment is met. A play on ahu (heap) and ‘awa (sour). [II] O Honu‘apo aku no ia o kahi  o ka ‘ahu‘awa. That is Honu‘apo where the ‘ahu‘awa grows. A Ka‘u saying about disappointment. The ‘ahu‘awa was much used as fiber for straining ‘awa. A play on hoka (to strain, to be disappointed).
+#&gt;    Dye.Color.and.Parts Kino.lau Location.on.Bishop.Museum.Kalihi.Campus
+#&gt;                 &lt;char&gt;   &lt;char&gt;                                  &lt;char&gt;
+#&gt; 1:      Red (capsules)                                                 
+#&gt; 2:                                                                     
+#&gt; 3:                                                                     
+#&gt; 4:                                                                     
+#&gt; 5:                                                                     
+#&gt; 6:                                                  Next to Castle Bldg
+#&gt;                                                                                                                                                                                                                                                                                                        Propagation.Information
+#&gt;                                                                                                                                                                                                                                                                                                                         &lt;char&gt;
+#&gt; 1:        Easy. Presoaked seeds sprout in 2-4 weeks, when 2 sets of leaves appear transplant into individual pots; broad elevation range but must drain well; will grow well in a large pot on apartment lanai (Bornhorst 1996:37–8; Bornhorst and Rauch 1994:10; Culliney and Koebele 1999:35–37; Nagata 1992:1993 addendum).
+#&gt; 2:                                                                                                             Easy. Grown from seeds, should be nicked w/ a file (scarified) or soaked; climate adaptable (Bornhorst 1996:55–56; Bornhorst and Rauch 1994:14–15; Culliney and Koebele 1999:53–54; Nagata 1992:1993 addendum).
+#&gt; 3:                                                                                                                                                                                                                                                                                                                            
+#&gt; 4:                                                                                                                                                                                                                                                                                                                            
+#&gt; 5: Easy. Seed bearing utricles are easily collected by hand, don&#39;t bury deep, seeds germinate in 1 week &amp; continues for 2–3 weeks; 1st or 2nd set of true leaves appear in 1 month &amp; should be transplanted to indivudual pots, 2-3 months after it reaches 1 foot it should be planted out (Culliney and Koebele 1999:39–41).
+#&gt; 6:                                                                                                                                                                                                                                                                                                                            
+#&gt;                                                                 Seed                                               Microscopy
+#&gt;                                                               &lt;char&gt;                                                   &lt;char&gt;
+#&gt; 1:           Seed length approximately 2.2 mm. Photograph: B.Kennedy  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 2:           Seed length approximately 10 mm. Photograph: B.Kennedy.  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 3: Seed length approximately 8.5 mm. Photograph: B.Kennedy. Species:                                                     &lt;NA&gt;
+#&gt; 4:   Seed length approximately 4 mm. Photograph: B.Kennedy. Species:                                                     &lt;NA&gt;
+#&gt; 5:            Seed length approximately 1 mm. Photograph: B.Kennedy. Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom.
+#&gt; 6: Seed length approximately 1.5 mm. Photograph: B.Kennedy. Species:                                                     &lt;NA&gt;
+#&gt;                                               Cross.Section                                           Radial.Section
+#&gt;                                                      &lt;char&gt;                                                   &lt;char&gt;
+#&gt; 1:  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 2:  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 3:                                                     &lt;NA&gt;                                                     &lt;NA&gt;
+#&gt; 4:                                                     &lt;NA&gt;                                                     &lt;NA&gt;
+#&gt; 5: Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom. Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom.
+#&gt; 6:                                                     &lt;NA&gt;                                                     &lt;NA&gt;
+#&gt;                                          Tangential.Section
+#&gt;                                                      &lt;char&gt;
+#&gt; 1:  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 2:  Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom
+#&gt; 3:                                                     &lt;NA&gt;
+#&gt; 4:                                                     &lt;NA&gt;
+#&gt; 5: Field of view: 2.6 mm x 1.6 mm. Photograph: H.Lennstrom.
+#&gt; 6:                                                     &lt;NA&gt;
 
-  doc &lt;- tryCatch(xml2::read_html(html_txt), error = identity)
-  if (inherits(doc, &quot;error&quot;)) return(safe_row(&quot;parse_error&quot;, status = status))
-
-  title_node &lt;- rvest::html_element(doc, &quot;title&quot;)
-  page_title &lt;- if (inherits(title_node, &quot;xml_missing&quot;)) NA_character_ else clean_txt(rvest::html_text2(title_node))
-
-  content_node &lt;- choose_content_node(doc)
-  if (inherits(content_node, &quot;xml_missing&quot;) || length(content_node) == 0) {
-    return(safe_row(&quot;content_not_found&quot;, status = status, title = page_title))
-  }
-
-  fields &lt;- extract_fields(content_node)
-
-  cbind(
-    data.table(url = url, page_title = page_title, status = status,
-               fetched_at = Sys.time(), error = NA_character_),
-    as.data.table(as.list(fields), keep.rownames = FALSE)
-  )
-}
-
-# Scrape many URLs
-scrape_many &lt;- function(urls, sleep_bounds = c(0.2, 0.6)) {
-  if (!length(urls)) return(data.table())
-  pb &lt;- txtProgressBar(min = 0, max = length(urls), style = 3)
-  res &lt;- vector(&quot;list&quot;, length(urls))
-  for (i in seq_along(urls)) {
-    Sys.sleep(runif(1, sleep_bounds[1], sleep_bounds[2]))  # polite delay
-    res[[i]] &lt;- tryCatch(scrape_one(urls[[i]]), error = function(e) {
-      data.table(url = urls[[i]], page_title = NA_character_, status = NA_integer_,
-                 fetched_at = Sys.time(), error = paste(&quot;unexpected_error:&quot;, e$message))
-    })
-    setTxtProgressBar(pb, i)
-  }
-  close(pb)
-  data.table::rbindlist(res, fill = TRUE, use.names = TRUE)
-}
-</code></pre>
-<pre class="r"><code>
-# Optional diagnostics: peek at first-column labels inside common containers for one URL
-u &lt;- &quot;https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=aalii&quot;
-doc &lt;- xml2::read_html(u)
-sels &lt;- c(&quot;#content&quot;,&quot;div#content&quot;,&quot;#main&quot;,&quot;main&quot;,&quot;article&quot;,&quot;.content&quot;,&quot;#mw-content-text&quot;,&quot;body&quot;)
-diag &lt;- lapply(sels, function(s) {
-  node &lt;- rvest::html_element(doc, s)
-  if (inherits(node, &quot;xml_missing&quot;) || length(node) == 0) return(NULL)
-  rows &lt;- rvest::html_elements(node, &quot;tr&quot;)
-  if (!length(rows)) return(NULL)
-  labs &lt;- unlist(lapply(rows, function(tr) {
-    cells &lt;- rvest::html_elements(tr, &quot;th, td&quot;)
-    if (length(cells) &gt;= 1) rvest::html_text2(cells[[1]]) else NA_character_
-  }))
-  data.table(selector = s, first_col_labels = unique(na.omit(stringr::str_squish(labs))))
-})
-Filter(Negate(is.null), diag)
-</code></pre>
-<pre class="r"><code>
-# Assumes you&#39;ve already run:
-# - setup_deps (packages)
-# - functions chunk (defines clean_txt, canon_label, extract_fields, scrape_one, scrape_many)
-
-stopifnot(exists(&quot;final_dt&quot;))
-url_col   &lt;- intersect(names(final_dt), c(&quot;url&quot;,&quot;URL&quot;,&quot;link&quot;,&quot;href&quot;))[1]
-depth_col &lt;- intersect(names(final_dt), c(&quot;depth&quot;,&quot;Depth&quot;,&quot;level&quot;,&quot;crawl_depth&quot;))[1]
-if (is.na(url_col))   stop(&quot;final_dt must have a URL column.&quot;)
-if (is.na(depth_col)) stop(&quot;final_dt must have a crawl depth column.&quot;)
-
-depth2_urls &lt;- unique(na.omit(final_dt[get(depth_col) == 2][[url_col]]))
-message(sprintf(&quot;Scraping %d depth-2 URLs …&quot;, length(depth2_urls)))
-
-# Execute scraping (polite delays handled in scrape_many/scrape_one)
-depth2_wide &lt;- scrape_many(depth2_urls)
-#&gt;   |                                                                          |                                                                  |   0%  |                                                                          |                                                                  |   1%  |                                                                          |=                                                                 |   1%  |                                                                          |=                                                                 |   2%  |                                                                          |==                                                                |   3%  |                                                                          |===                                                               |   4%  |                                                                          |===                                                               |   5%  |                                                                          |====                                                              |   6%  |                                                                          |=====                                                             |   7%  |                                                                          |=====                                                             |   8%  |                                                                          |======                                                            |   9%  |                                                                          |======                                                            |  10%  |                                                                          |=======                                                           |  10%  |                                                                          |=======                                                           |  11%  |                                                                          |========                                                          |  12%  |                                                                          |=========                                                         |  13%  |                                                                          |=========                                                         |  14%  |                                                                          |==========                                                        |  14%  |                                                                          |==========                                                        |  15%  |                                                                          |==========                                                        |  16%  |                                                                          |===========                                                       |  17%  |                                                                          |============                                                      |  18%  |                                                                          |============                                                      |  19%  |                                                                          |=============                                                     |  19%  |                                                                          |=============                                                     |  20%  |                                                                          |==============                                                    |  21%  |                                                                          |===============                                                   |  22%  |                                                                          |===============                                                   |  23%  |                                                                          |================                                                  |  24%  |                                                                          |================                                                  |  25%  |                                                                          |=================                                                 |  26%  |                                                                          |==================                                                |  27%  |                                                                          |==================                                                |  28%  |                                                                          |===================                                               |  28%  |                                                                          |===================                                               |  29%  |                                                                          |====================                                              |  30%  |                                                                          |====================                                              |  31%  |                                                                          |=====================                                             |  32%  |                                                                          |======================                                            |  33%  |                                                                          |======================                                            |  34%  |                                                                          |=======================                                           |  34%  |                                                                          |=======================                                           |  35%  |                                                                          |========================                                          |  36%  |                                                                          |========================                                          |  37%  |                                                                          |=========================                                         |  37%  |                                                                          |=========================                                         |  38%  |                                                                          |=========================                                         |  39%  |                                                                          |==========================                                        |  39%  |                                                                          |==========================                                        |  40%  |                                                                          |===========================                                       |  41%  |                                                                          |============================                                      |  42%  |                                                                          |============================                                      |  43%  |                                                                          |=============================                                     |  43%  |                                                                          |=============================                                     |  44%  |                                                                          |==============================                                    |  45%  |                                                                          |==============================                                    |  46%  |                                                                          |===============================                                   |  47%  |                                                                          |===============================                                   |  48%  |                                                                          |================================                                  |  48%  |                                                                          |================================                                  |  49%  |                                                                          |=================================                                 |  50%  |                                                                          |==================================                                |  51%  |                                                                          |==================================                                |  52%  |                                                                          |===================================                               |  52%  |                                                                          |===================================                               |  53%  |                                                                          |====================================                              |  54%  |                                                                          |====================================                              |  55%  |                                                                          |=====================================                             |  56%  |                                                                          |=====================================                             |  57%  |                                                                          |======================================                            |  57%  |                                                                          |======================================                            |  58%  |                                                                          |=======================================                           |  59%  |                                                                          |========================================                          |  60%  |                                                                          |========================================                          |  61%  |                                                                          |=========================================                         |  61%  |                                                                          |=========================================                         |  62%  |                                                                          |=========================================                         |  63%  |                                                                          |==========================================                        |  63%  |                                                                          |==========================================                        |  64%  |                                                                          |===========================================                       |  65%  |                                                                          |===========================================                       |  66%  |                                                                          |============================================                      |  66%  |                                                                          |============================================                      |  67%  |                                                                          |=============================================                     |  68%  |                                                                          |==============================================                    |  69%  |                                                                          |==============================================                    |  70%  |                                                                          |===============================================                   |  71%  |                                                                          |===============================================                   |  72%  |                                                                          |================================================                  |  72%  |                                                                          |================================================                  |  73%  |                                                                          |=================================================                 |  74%  |                                                                          |==================================================                |  75%  |                                                                          |==================================================                |  76%  |                                                                          |===================================================               |  77%  |                                                                          |===================================================               |  78%  |                                                                          |====================================================              |  79%  |                                                                          |=====================================================             |  80%  |                                                                          |=====================================================             |  81%  |                                                                          |======================================================            |  81%  |                                                                          |======================================================            |  82%  |                                                                          |=======================================================           |  83%  |                                                                          |========================================================          |  84%  |                                                                          |========================================================          |  85%  |                                                                          |========================================================          |  86%  |                                                                          |=========================================================         |  86%  |                                                                          |=========================================================         |  87%  |                                                                          |==========================================================        |  88%  |                                                                          |===========================================================       |  89%  |                                                                          |===========================================================       |  90%  |                                                                          |============================================================      |  90%  |                                                                          |============================================================      |  91%  |                                                                          |=============================================================     |  92%  |                                                                          |=============================================================     |  93%  |                                                                          |==============================================================    |  94%  |                                                                          |===============================================================   |  95%  |                                                                          |===============================================================   |  96%  |                                                                          |================================================================  |  97%  |                                                                          |================================================================= |  98%  |                                                                          |================================================================= |  99%  |                                                                          |==================================================================|  99%  |                                                                          |==================================================================| 100%
-
-# Optional: write results
-# data.table::fwrite(depth2_wide, &quot;data/depth2_wide.csv&quot;)
-
-# Quick summary of extracted fields
-found_cols &lt;- setdiff(names(depth2_wide), c(&quot;url&quot;,&quot;page_title&quot;,&quot;status&quot;,&quot;fetched_at&quot;,&quot;error&quot;))
-message(sprintf(&quot;Extracted %d distinct field labels.&quot;, length(found_cols)))
-print(sort(found_cols))
-#&gt; character(0)
-
-depth2_wide
-#&gt;                                                                              url
-#&gt;                                                                           &lt;char&gt;
-#&gt;   1:    https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=aalii
-#&gt;   2:     https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=ae_S
-#&gt;   3:     https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=ae_Z
-#&gt;   4:   https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=ahakea
-#&gt;   5:  https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=aheahea
-#&gt;  ---                                                                            
-#&gt; 141:     https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=ulei
-#&gt; 142:      https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=ulu
-#&gt; 143:    https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=uluhe
-#&gt; 144:    https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=wauke
-#&gt; 145: https://data.bishopmuseum.org/ethnobotanydb/ethnobotany.php?b=d&amp;ID=wiliwili
-#&gt;                                page_title status          fetched_at  error
-#&gt;                                    &lt;char&gt;  &lt;int&gt;              &lt;POSc&gt; &lt;char&gt;
-#&gt;   1: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:41:22   &lt;NA&gt;
-#&gt;   2: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:41:23   &lt;NA&gt;
-#&gt;   3: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:41:24   &lt;NA&gt;
-#&gt;   4: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:41:24   &lt;NA&gt;
-#&gt;   5: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:41:25   &lt;NA&gt;
-#&gt;  ---                                                                       
-#&gt; 141: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:42:32   &lt;NA&gt;
-#&gt; 142: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:42:32   &lt;NA&gt;
-#&gt; 143: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:42:33   &lt;NA&gt;
-#&gt; 144: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:42:33   &lt;NA&gt;
-#&gt; 145: Bishop Museum - Ethnobotany Database    200 2025-08-19 02:42:33   &lt;NA&gt;</code></pre>
-</div>
-<div id="leaflet-map" class="section level1">
-<h1>Leaflet map</h1>
-<pre class="r"><code>
-# Create a leaflet map widget
-leaflet() %&gt;%
-  # Add default OpenStreetMap tiles to the map
-  addTiles() %&gt;%
-  # Set the initial view of the map
-  setView(lng = -157.858333, lat = 21.306944, zoom = 10) %&gt;%
-  # Add a marker for a specific location (Honolulu)
-  addMarkers(lng = -157.858333, lat = 21.306944, popup = &quot;Aloha from Honolulu! 🌺&quot;)</code></pre>
-<div class="leaflet html-widget html-fill-item" id="htmlwidget-90e5d67ffaea866b8d91" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-90e5d67ffaea866b8d91">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[21.306944,-157.858333,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Aloha from Honolulu! 🌺",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"setView":[[21.306944,-157.858333],10,[]],"limits":{"lat":[21.306944,21.306944],"lng":[-157.858333,-157.858333]}},"evals":[],"jsHooks":[]}</script>
+# Save the details to CSV
+write.csv(details_df, file = &quot;data/bishopmuseum_details.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 
 
